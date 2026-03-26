@@ -1,91 +1,91 @@
-
-# 🔐 TryHackMe - Web Application Basics (Day 1)
+# 🔍 TryHackMe - Passive Reconnaissance (Day 2)
 
 ## 📅 Date
-25 March 2026
+26 March 2026
 
 ---
 
 ## 🚀 What I Learned
 
-Today I completed the **Web Application Basics** lab on TryHackMe.
+Today I performed **Passive Reconnaissance** using real tools like WHOIS, NSLOOKUP, and DIG.
 
-I learned the fundamentals of how web applications communicate using HTTP methods and APIs.
-
----
-
-## 🧠 Key Concepts
-
-### 🌐 HTTP Methods
-- **GET** → Retrieve data
-- **POST** → Send/update data
-- **DELETE** → Remove data
+Passive recon collects information **without directly interacting with the target system**, making it safe and legal.
 
 ---
 
-### 🔗 API Interaction
-- Understood how APIs work with endpoints like:
+## 🧠 Practical Analysis (Real Target)
 
+### 🎯 Target Domain:techforage.in
+ 
+---
 
-/api/user1
-/api/user2
+## 1️⃣ WHOIS Analysis
 
-- Learned how different HTTP methods affect the server response
+**Command:**
+
+**Key Findings:**
+- Registrar: GoDaddy  
+- Creation Date: 2014  
+- Expiry Date: 2028  
+- Location: Tamil Nadu, India  
+- Name Servers:
+  - ns1.bluehost.in  
+  - ns2.bluehost.in  
+
+👉 Insight:  
+- Domain is **active and long-term registered**  
+- Hosting likely on **Bluehost infrastructure**
 
 ---
 
-### 🛠️ Practical Tasks Completed
+## 2️⃣ NSLOOKUP (Reverse Lookup)
 
-#### ✅ Task 1: DELETE Request
-- Endpoint: `/api/user/1`
-- Successfully deleted a user
-- Received flag:
+**Command:**
 
----
-
-#### ✅ Task 2: POST Request (Update User)
-- Endpoint: `/api/user/2`
-- Updated user (Bob) country from **UK → US**
-- Learned how to send data using POST body:
-
-
+👉 Insight:
+- IP belongs to **web hosting service**
+- Indicates **shared hosting environment**
 
 ---
 
-## ⚠️ Mistake I Made
-- Initially sent a POST request **without data**
-- Server performed unexpected action (deleted user)
-- Lesson: Always check **request body + headers**
+## 🔬 Raw Output (Lab Evidence)
+
+Included actual command outputs from lab:
+
+:contentReference[oaicite:0]{index=0}
 
 ---
 
-## 🧪 Tools Used
-- TryHackMe built-in browser
-- HTTP request editor
+## ⚠️ Key Concepts
+
+- WHOIS reveals domain ownership & infrastructure  
+- DNS lookup reveals hosting details  
+- Passive recon uses **public data only**  
 
 ---
 
 ## 📸 Screenshot
 
-![Lab Screenshot](./screenshot.png)
+![Passive Recon](./screenshot.png)
 
 ---
 
-## 🎯 Key Takeaways
-- APIs depend heavily on HTTP methods
-- Small mistakes (like missing body data) can change behavior
-- Understanding requests = foundation of web hacking
+## 🎯 Takeaways
+
+- Even basic tools reveal critical infrastructure  
+- DNS and WHOIS = powerful intelligence sources  
+- Real-world recon starts with passive methods  
 
 ---
 
 ## 🔥 Next Step
-- Learn **Burp Suite**
-- Practice **API manipulation**
-- Move to **authentication bypass labs**
+
+- Active Recon (Nmap scanning)  
+- Subdomain enumeration  
+- Web vulnerability testing  
 
 ---
 
 ## 💀 Goal
-Become a **real-world ethical hacker** by mastering web exploitation.
 
-
+Build strong recon skills → move to bug bounty & real pentesting
