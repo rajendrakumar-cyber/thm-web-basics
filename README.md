@@ -1,91 +1,36 @@
-# 🔍 TryHackMe - Passive Reconnaissance (Day 2)
+# Nmap Live Host Discovery
 
-## 📅 Date
-26 March 2026
+## Overview
 
----
+This project demonstrates how to discover live hosts using Nmap.
 
-## 🚀 What I Learned
+## Tools Used
 
-Today I performed **Passive Reconnaissance** using real tools like WHOIS, NSLOOKUP, and DIG.
+* Nmap
+* Kali Linux
+* TryHackMe Lab
 
-Passive recon collects information **without directly interacting with the target system**, making it safe and legal.
+## Techniques Covered
 
----
+* ARP Scan
+* ICMP Scan
+* TCP SYN & ACK Ping
+* UDP Ping
 
-## 🧠 Practical Analysis (Real Target)
+## Key Commands
 
-### 🎯 Target Domain:techforage.in
- 
----
+```
+sudo nmap -PR -sn <target>/24
+sudo nmap -PE -sn <target>/24
+sudo nmap -PS22,80,443 -sn <target>/30
+```
 
-## 1️⃣ WHOIS Analysis
+## Learning Outcome
 
-**Command:**
+* Understood host discovery techniques
+* Learned CIDR basics
+* Practiced real-world scanning
 
-**Key Findings:**
-- Registrar: GoDaddy  
-- Creation Date: 2014  
-- Expiry Date: 2028  
-- Location: Tamil Nadu, India  
-- Name Servers:
-  - ns1.bluehost.in  
-  - ns2.bluehost.in  
+## Screenshots
 
-👉 Insight:  
-- Domain is **active and long-term registered**  
-- Hosting likely on **Bluehost infrastructure**
-
----
-
-## 2️⃣ NSLOOKUP (Reverse Lookup)
-
-**Command:**
-
-👉 Insight:
-- IP belongs to **web hosting service**
-- Indicates **shared hosting environment**
-
----
-
-## 🔬 Raw Output (Lab Evidence)
-
-Included actual command outputs from lab:
-
-:contentReference[oaicite:0]{index=0}
-
----
-
-## ⚠️ Key Concepts
-
-- WHOIS reveals domain ownership & infrastructure  
-- DNS lookup reveals hosting details  
-- Passive recon uses **public data only**  
-
----
-
-## 📸 Screenshot
-
-![Passive Recon](./screenshot.png)
-
----
-
-## 🎯 Takeaways
-
-- Even basic tools reveal critical infrastructure  
-- DNS and WHOIS = powerful intelligence sources  
-- Real-world recon starts with passive methods  
-
----
-
-## 🔥 Next Step
-
-- Active Recon (Nmap scanning)  
-- Subdomain enumeration  
-- Web vulnerability testing  
-
----
-
-## 💀 Goal
-
-Build strong recon skills → move to bug bounty & real pentesting
+(See /screenshots folder)
