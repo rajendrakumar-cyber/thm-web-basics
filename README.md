@@ -1,36 +1,49 @@
-# OWASP ZAP - Introduction
+# Nmap and OpenVPN - TryHackMe
 
 ## Overview
 
-This project covers the basics of OWASP ZAP, a web application security testing tool.
+This project demonstrates connecting to TryHackMe using OpenVPN and performing network scanning using Nmap.
 
-## What is OWASP ZAP?
+## Tools Used
 
-OWASP ZAP (Zed Attack Proxy) is an open-source tool used to find vulnerabilities in web applications.
+* OpenVPN
+* Nmap
+* Kali Linux
+* TryHackMe
 
-## Key Features
+## OpenVPN Setup
 
-* Intercept Proxy
-* Spider (Crawler)
-* Active Scan
-* Forced Browsing
-* Fuzzer
+```bash
+sudo openvpn username.ovpn
+```
 
-## How It Works
+## Verification
 
-Browser → ZAP Proxy → Target Website
+```bash
+ip a
+ping 10.10.x.x
+```
 
-## Setup
+## Nmap Scan
 
-* Installed ZAP on Kali Linux
-* Configured browser proxy (127.0.0.1:8080)
-* Installed ZAP SSL certificate
+```bash
+nmap -sC -sV <target-ip>
+```
+
+## Results
+
+* Connected successfully to VPN
+* Discovered open ports:
+
+  * 21 (FTP)
+  * 22 (SSH)
+  * 80 (HTTP)
 
 ## Learning Outcome
 
-* Understood web proxy concept
-* Learned how to intercept requests
-* Performed vulnerability scanning
+* Understood VPN usage in labs
+* Learned network scanning basics
+* Identified attack surfaces
 
 ## Screenshots
 
