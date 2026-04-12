@@ -1,50 +1,73 @@
-# Nmap and OpenVPN - TryHackMe
+# 🌐 Web Fundamentals Notes (DNS, HTTP, Websites)
 
-## Overview
+> Personal learning notes from TryHackMe — focused on real-world understanding for ethical hacking.
 
-This project demonstrates connecting to TryHackMe using OpenVPN and performing network scanning using Nmap.
+---
 
-## Tools Used
+## 📌 1. DNS (Domain Name System)
 
-* OpenVPN
-* Nmap
-* Kali Linux
-* TryHackMe
+### What is DNS?
+DNS is like the internet’s phonebook. It converts human-readable domain names into IP addresses.
 
-## OpenVPN Setup
+
+
+---
+
+### How DNS Works
+
+1. User enters URL
+2. Browser checks cache
+3. OS checks DNS cache
+4. Query sent to Resolver
+5. Resolver contacts:
+   - Root Server
+   - TLD Server (.com, .org)
+   - Authoritative Server
+6. IP returned to browser
+7. Browser connects to server
+
+---
+
+### Common DNS Records
+
+| Record | Purpose |
+|--------|--------|
+| A | Domain → IPv4 |
+| AAAA | Domain → IPv6 |
+| CNAME | Alias |
+| MX | Mail server |
+| TXT | Metadata / verification |
+
+---
+
+### Tools (Recon)
 
 ```bash
-sudo openvpn username.ovpn
-```
+nslookup example.com
+dig example.com
+amass enum -d example.com
 
-## Verification
+HTTP Request Example
+GET /index.html HTTP/1.1
+Host: example.com
+HTTP Response Example
+HTTP/1.1 200 OK
+Content-Type: text/html
 
-```bash
-ip a
-ping 10.10.x.x
-```
+| Method | Purpose       |
+| ------ | ------------- |
+| GET    | Retrieve data |
+| POST   | Send data     |
+| PUT    | Update data   |
+| DELETE | Remove data   |
 
-## Nmap Scan
+| Code | Meaning               |
+| ---- | --------------------- |
+| 200  | OK                    |
+| 201  | Created               |
+| 301  | Redirect              |
+| 403  | Forbidden             |
+| 404  | Not Found             |
+| 500  | Internal Server Error |
+| 503  | Service Unavailable   |
 
-```bash
-nmap -sC -sV <target-ip>
-```
-
-## Results
-
-* Connected successfully to VPN
-* Discovered open ports:
-
-  * 21 (FTP)
-  * 22 (SSH)
-  * 80 (HTTP)
-
-## Learning Outcome
-
-* Understood VPN usage in labs
-* Learned network scanning basics
-* Identified attack surfaces
-
-## Screenshots
-
-(See /screenshots folder)
