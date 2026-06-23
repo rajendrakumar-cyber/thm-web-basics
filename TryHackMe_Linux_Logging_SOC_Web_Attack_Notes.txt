@@ -1,0 +1,182 @@
+TRYHACKME - LINUX LOGGING FOR SOC (WEB ATTACK INVESTIGATION)
+============================================================
+
+ROOM OBJECTIVE
+--------------
+Investigate Linux logs to identify:
+- Successful logins
+- Failed login attempts
+- Brute-force attacks
+- Command injection
+- Reverse shell activity
+- Audit log evidence
+
+IMPORTANT LOG FILES
+-------------------
+
+/var/log/auth.log
+- Successful SSH logins
+- Failed SSH logins
+- User authentication events
+
+/var/log/nginx/access.log
+- Web requests
+- Attack payloads
+- Command injection attempts
+
+/var/log/audit/audit.log
+- Process execution
+- Command history
+- Security investigations
+
+KEY FINDINGS
+------------
+
+1. Successful SSH Login
+
+Command:
+grep Accepted /var/log/auth.log
+
+Interesting Entry:
+Accepted password for root from 91.224.92.79
+
+Meaning:
+Attacker successfully authenticated as root.
+
+--------------------------------------------------
+
+2. Failed SSH Logins
+
+Command:
+grep -i failed /var/log/auth.log
+
+Observed:
+- root account attacks
+- invalid user: roy
+- invalid user: user
+- multiple brute-force attempts
+
+Indicators:
+193.46.255.33
+80.94.95.112
+91.224.92.79
+193.46.255.159
+
+--------------------------------------------------
+
+3. Command Injection Discovery
+
+Command:
+cat /opt/trypingme/main.py
+
+Vulnerable Code:
+
+cmd = f"ping -c 2 {host}"
+result = subprocess.check_output(cmd, shell=True)
+
+Issue:
+shell=True allows command injection.
+
+Flag Found:
+
+THM{i_am_vulnerable!}
+
+--------------------------------------------------
+
+4. Web Exploitation Evidence
+
+Command:
+cat /var/log/nginx/access.log | grep .py
+
+Attacker Payload:
+
+GET /ping?host=;cat+/opt/trypingme/main.py
+
+Purpose:
+Read application source code.
+
+--------------------------------------------------
+
+5. Reverse Shell Attempt
+
+Payload:
+
+python3 -c 'import socket,subprocess,os...'
+
+Attacker IP:
+10.14.105.255
+
+Port:
+1337
+
+Purpose:
+Create reverse shell back to attacker.
+
+--------------------------------------------------
+
+6. Audit Log Investigation
+
+Command:
+ausearch -i -x whoami
+
+Result:
+whoami executed by ubuntu user.
+
+Command:
+ausearch -i --pid 1018
+
+Revealed:
+/bin/sh -c ping -c 2 ;whoami
+
+Confirms command injection.
+
+--------------------------------------------------
+
+ATTACK TIMELINE
+---------------
+
+1. Attacker accessed web application.
+2. Tested command execution.
+3. Ran whoami.
+4. Ran ls.
+5. Ran pwd.
+6. Read main.py.
+7. Identified vulnerability.
+8. Attempted reverse shell.
+
+--------------------------------------------------
+
+SOC ANALYST TAKEAWAYS
+---------------------
+
+1. Monitor auth.log for brute-force attacks.
+2. Review nginx access logs for payloads.
+3. Use auditd to trace process execution.
+4. Investigate unusual shell commands.
+5. Look for reverse shell indicators.
+6. Review applications using shell=True.
+
+USEFUL COMMANDS
+---------------
+
+grep Accepted /var/log/auth.log
+grep -i failed /var/log/auth.log
+cat /var/log/nginx/access.log
+ausearch -i -x whoami
+ausearch -i --pid <PID>
+journalctl -xe
+
+FLAGS
+-----
+
+THM{i_am_vulnerable!}
+
+SUMMARY
+-------
+
+This lab demonstrated how SOC analysts can correlate:
+- Authentication logs
+- Web server logs
+- Audit logs
+
+to identify command injection, attacker activity, and reverse shell attempts.
