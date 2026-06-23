@@ -1,0 +1,140 @@
+
+LINUX LOGGING FOR SOC – TRYHACKME NOTES
+=======================================
+
+OVERVIEW
+--------
+Linux logs are critical for SOC analysts. They help investigate:
+- Authentication events
+- System activity
+- Service failures
+- Privilege escalation
+- Malware execution
+- Network activity
+
+IMPORTANT LOG FILES
+-------------------
+
+1. /var/log/syslog
+   Purpose:
+   - General system events
+   - Services and daemon activity
+   Example:
+   grep timesync /var/log/syslog
+
+2. /var/log/auth.log
+   Purpose:
+   - SSH logins
+   - Failed login attempts
+   - sudo activity
+   Example:
+   grep sshd auth.log | grep -i failed
+
+3. /var/log/kern.log
+   Purpose:
+   - Kernel messages
+   - Driver issues
+   - Security module events
+
+4. /var/log/wtmp
+   Purpose:
+   - Successful login history
+   Command:
+   last
+
+5. /var/log/btmp
+   Purpose:
+   - Failed login attempts
+   Command:
+   sudo last -f /var/log/btmp
+
+6. /var/log/apt/history.log
+   Purpose:
+   - Package installation history
+   Example:
+   grep unzip history.log
+
+AUDIT LOGGING
+-------------
+
+Auditd provides detailed security monitoring.
+
+Common commands:
+
+ausearch -i -k file_thmsecret
+ausearch -i -k proc_wget
+ausearch -i -k proc_all
+
+Findings from the lab:
+- User created: xerxes
+- Secret file accessed:
+  cat /secret.thm
+- Naabu downloaded from GitHub
+- Binary unzipped and executed
+- Network scanning performed
+
+SOC TRIAGE WORKFLOW
+-------------------
+
+1. Check auth.log
+   - Failed logins
+   - Brute-force attempts
+   - Privilege escalation
+
+2. Check btmp
+   - Failed authentication history
+
+3. Check syslog
+   - Service failures
+   - Time synchronization issues
+   - Process activity
+
+4. Check apt logs
+   - New software installations
+
+5. Check audit logs
+   - Sensitive file access
+   - Command execution
+   - Malware activity
+
+KEY COMMANDS
+------------
+
+tail -f /var/log/syslog
+grep -i failed /var/log/auth.log
+last
+sudo last -f /var/log/btmp
+ausearch -i -k <key>
+journalctl -xe
+
+INDICATORS FOUND IN LAB
+-----------------------
+
+- Multiple failed SSH logins
+- Invalid users: admin, support
+- Root login attempts
+- New user account: xerxes
+- Installation of zip/unzip
+- Auditd configuration changes
+- Access to /secret.thm
+- Download and execution of naabu
+
+INTERVIEW SUMMARY
+-----------------
+
+Q: Which Linux log tracks failed SSH logins?
+A: /var/log/auth.log
+
+Q: Which file records failed login history?
+A: /var/log/btmp
+
+Q: Which command views failed logins?
+A: sudo last -f /var/log/btmp
+
+Q: Which log tracks package installations?
+A: /var/log/apt/history.log
+
+Q: Which service provides detailed auditing?
+A: auditd
+
+END OF NOTES

@@ -1,0 +1,279 @@
+──(white㉿white)-[~/Documents]
+└─$ ssh ubuntu@10.48.185.190                                 
+The authenticity of host '10.48.185.190 (10.48.185.190)' can't be established.
+ED25519 key fingerprint is: SHA256:1bC+2Lfz3gqCuuGQMJRoApTZ/8bUxg0tlE4vPMhPEa4
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.48.185.190' (ED25519) to the list of known hosts.
+ubuntu@10.48.185.190's password: 
+Welcome to Ubuntu 24.04.1 LTS (GNU/Linux 6.14.0-1010-aws x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Tue Jun 23 02:49:03 UTC 2026
+
+  System load:  0.14               Temperature:           -273.1 C
+  Usage of /:   15.0% of 19.31GB   Processes:             128
+  Memory usage: 36%                Users logged in:       1
+  Swap usage:   0%                 IPv4 address for ens5: 10.48.185.190
+
+ * Ubuntu Pro delivers the most comprehensive open source security and
+   compliance features.
+
+   https://ubuntu.com/aws/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+131 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+Failed to connect to https://changelogs.ubuntu.com/meta-release-lts. Check your Internet connection or proxy settings
+
+
+Last login: Tue Jun 23 02:46:17 2026 from 10.48.121.127
+ubuntu@thm-vm:~$ ls
+ubuntu@thm-vm:~$ ls -la
+total 48
+drwxr-xr-x 5 ubuntu ubuntu 4096 Aug 28  2025 .
+drwxr-xr-x 3 root   root   4096 Oct 22  2024 ..
+-rw------- 1 ubuntu ubuntu  122 Oct 22  2024 .Xauthority
+-rw------- 1 ubuntu ubuntu   59 Aug 13  2025 .bash_history
+-rw-r--r-- 1 ubuntu ubuntu  220 Feb 25  2020 .bash_logout
+-rw-r--r-- 1 ubuntu ubuntu 4431 Aug 28  2025 .bashrc
+drwx------ 2 ubuntu ubuntu 4096 Oct 22  2024 .cache
+-rw------- 1 ubuntu ubuntu   20 Aug 28  2025 .lesshst
+drwxrwxr-x 3 ubuntu ubuntu 4096 Aug 11  2025 .local
+-rw-r--r-- 1 ubuntu ubuntu  807 Feb 25  2020 .profile
+drwx------ 2 ubuntu ubuntu 4096 Oct 22  2024 .ssh
+-rw-r--r-- 1 ubuntu ubuntu    0 Oct 22  2024 .sudo_as_admin_successful
+ubuntu@thm-vm:~$ cd/
+-bash: cd/: No such file or directory
+ubuntu@thm-vm:~$ cd /
+ubuntu@thm-vm:/$ cd ./var/logs
+-bash: cd: ./var/logs: No such file or directory
+ubuntu@thm-vm:/$ cd /var/log
+ubuntu@thm-vm:/var/log$ ls
+README            cloud-init-output.log  dmesg.4.gz  sysstat
+alternatives.log  cloud-init.log         dpkg.log    ubuntu-advantage.log
+amazon            dist-upgrade           journal     unattended-upgrades
+apport.log        dmesg                  kern.log    upgrade
+apt               dmesg.0                landscape   wtmp
+audit             dmesg.1.gz             lastlog
+auth.log          dmesg.2.gz             private
+btmp              dmesg.3.gz             syslog
+ubuntu@thm-vm:/var/log$ head syslog
+2025-08-12T16:15:01.043238+00:00 thm-vm CRON[1206]: (root) CMD (command -v debian-sa1 > /dev/null && debian-sa1 1 1)
+2025-08-12T16:17:01.059383+00:00 thm-vm CRON[1211]: (root) CMD (cd / && run-parts --report /etc/cron.hourly)
+2025-08-12T16:25:01.092359+00:00 thm-vm CRON[1215]: (root) CMD (command -v debian-sa1 > /dev/null && debian-sa1 1 1)
+2025-08-12T16:33:30.948237+00:00 thm-vm amazon-ssm-agent.amazon-ssm-agent[569]: 2025-08-12 16:33:30.9474 WARN EC2RoleProvider Failed to connect to Systems Manager with instance profile role credentials. Err: retrieved credentials failed to report to ssm. Error: EC2RoleRequestError: no EC2 instance role found
+2025-08-12T16:33:31.048751+00:00 thm-vm amazon-ssm-agent.amazon-ssm-agent[569]: 2025-08-12 16:33:30.9923 ERROR EC2RoleProvider Failed to connect to Systems Manager with SSM role credentials. error calling RequestManagedInstanceRoleToken: AccessDeniedException: Systems Manager's instance management role is not configured for account: 739930428441
+2025-08-12T16:33:31.048866+00:00 thm-vm amazon-ssm-agent.amazon-ssm-agent[569]: #011status code: 400, request id: d1c97d23-7cd1-4c7b-a54f-37217c917f3d
+2025-08-12T16:35:01.109841+00:00 thm-vm CRON[1219]: (root) CMD (command -v debian-sa1 > /dev/null && debian-sa1 1 1)
+2025-08-12T16:41:27.162546+00:00 thm-vm dbus-daemon[563]: [system] Activating via systemd: service name='org.freedesktop.PackageKit' unit='packagekit.service' requested by ':1.18' (uid=0 pid=1309 comm="/usr/bin/gdbus call --system --dest org.freedeskto" label="unconfined")
+2025-08-12T16:41:27.174778+00:00 thm-vm systemd[1]: Starting packagekit.service - PackageKit Daemon...
+2025-08-12T16:41:27.190811+00:00 thm-vm PackageKit: daemon start
+ubuntu@thm-vm:/var/log$ cd syslog
+-bash: cd: syslog: Not a directory
+ubuntu@thm-vm:/var/log$ cd /syslog
+-bash: cd: /syslog: No such file or directory
+ubuntu@thm-vm:/var/log$ ls
+README            cloud-init-output.log  dmesg.4.gz  sysstat
+alternatives.log  cloud-init.log         dpkg.log    ubuntu-advantage.log
+amazon            dist-upgrade           journal     unattended-upgrades
+apport.log        dmesg                  kern.log    upgrade
+apt               dmesg.0                landscape   wtmp
+audit             dmesg.1.gz             lastlog
+auth.log          dmesg.2.gz             private
+btmp              dmesg.3.gz             syslog
+ubuntu@thm-vm:/var/log$ grep timesync /var/log/syslog
+2025-08-13T13:41:48.184089+00:00 thm-vm systemd[1]: Starting systemd-timesyncd.service - Network Time Synchronization...
+2025-08-13T13:41:48.184498+00:00 thm-vm systemd[1]: Started systemd-timesyncd.service - Network Time Synchronization.
+2025-08-13T13:41:48.184973+00:00 thm-vm systemd-timesyncd[275]: Network configuration changed, trying to establish connection.
+2025-08-13T13:41:48.185026+00:00 thm-vm systemd-timesyncd[275]: Network configuration changed, trying to establish connection.
+2025-08-13T13:41:48.197983+00:00 thm-vm systemd-timesyncd[275]: Network configuration changed, trying to establish connection.
+2025-08-13T13:42:17.819639+00:00 thm-vm systemd-timesyncd[275]: Contacted time server 185.125.190.58:123 (ntp.ubuntu.com).
+2025-08-13T13:42:17.821464+00:00 thm-vm systemd-timesyncd[275]: Initial clock synchronization to Wed 2025-08-13 13:42:17.947612 UTC.
+2025-08-13T13:57:19.918018+00:00 thm-vm systemd[1]: Starting systemd-timesyncd.service - Network Time Synchronization...
+2025-08-13T13:57:19.918420+00:00 thm-vm systemd[1]: Started systemd-timesyncd.service - Network Time Synchronization.
+2025-08-13T13:57:19.918839+00:00 thm-vm systemd-timesyncd[268]: Network configuration changed, trying to establish connection.
+2025-08-13T13:57:19.918893+00:00 thm-vm systemd-timesyncd[268]: Network configuration changed, trying to establish connection.
+2025-08-13T13:57:19.927508+00:00 thm-vm systemd-timesyncd[268]: Network configuration changed, trying to establish connection.
+2025-08-13T13:57:49.388678+00:00 thm-vm systemd-timesyncd[268]: Contacted time server 185.125.190.58:123 (ntp.ubuntu.com).
+2025-08-13T13:57:49.388941+00:00 thm-vm systemd-timesyncd[268]: Initial clock synchronization to Wed 2025-08-13 13:57:49.387835 UTC.
+2025-08-28T14:02:07.691626+00:00 thm-vm systemd[1]: Starting systemd-timesyncd.service - Network Time Synchronization...
+2025-08-28T14:02:07.692053+00:00 thm-vm systemd[1]: Started systemd-timesyncd.service - Network Time Synchronization.
+2025-08-28T14:02:07.694025+00:00 thm-vm systemd-timesyncd[282]: Network configuration changed, trying to establish connection.
+2025-08-28T14:02:07.694059+00:00 thm-vm systemd-timesyncd[282]: No network connectivity, watching for changes.
+2025-08-28T14:02:07.694107+00:00 thm-vm systemd-timesyncd[282]: Network configuration changed, trying to establish connection.
+2025-08-28T14:02:07.694115+00:00 thm-vm systemd-timesyncd[282]: Contacted time server 185.125.190.58:123 (ntp.ubuntu.com).
+2025-08-28T14:02:07.694123+00:00 thm-vm systemd-timesyncd[282]: Initial clock synchronization to Thu 2025-08-28 14:02:00.543203 UTC.
+2025-09-09T13:45:41.663380+00:00 thm-vm systemd[1]: Starting systemd-timesyncd.service - Network Time Synchronization...
+2025-09-09T13:45:41.663516+00:00 thm-vm systemd[1]: Started systemd-timesyncd.service - Network Time Synchronization.
+2025-09-09T13:45:41.665867+00:00 thm-vm systemd-timesyncd[266]: Network configuration changed, trying to establish connection.
+2025-09-09T13:45:41.665901+00:00 thm-vm systemd-timesyncd[266]: No network connectivity, watching for changes.
+2025-09-09T13:45:41.665950+00:00 thm-vm systemd-timesyncd[266]: Network configuration changed, trying to establish connection.
+2025-09-09T13:45:41.665964+00:00 thm-vm systemd-timesyncd[266]: Contacted time server 185.125.190.58:123 (ntp.ubuntu.com).
+2025-09-09T13:45:41.665971+00:00 thm-vm systemd-timesyncd[266]: Initial clock synchronization to Tue 2025-09-09 13:45:34.851705 UTC.
+2026-06-23T02:46:03.775650+00:00 thm-vm systemd[1]: Starting systemd-timesyncd.service - Network Time Synchronization...
+2026-06-23T02:46:03.775717+00:00 thm-vm systemd[1]: Started systemd-timesyncd.service - Network Time Synchronization.
+2026-06-23T02:46:03.776122+00:00 thm-vm systemd-timesyncd[286]: Network configuration changed, trying to establish connection.
+2026-06-23T02:46:03.776148+00:00 thm-vm systemd-timesyncd[286]: No network connectivity, watching for changes.
+2026-06-23T02:46:03.776192+00:00 thm-vm systemd-timesyncd[286]: Network configuration changed, trying to establish connection.
+2026-06-23T02:46:08.019194+00:00 thm-vm systemd-timesyncd[286]: Timed out waiting for reply from 185.125.190.56:123 (ntp.ubuntu.com).
+2026-06-23T02:46:18.267857+00:00 thm-vm systemd-timesyncd[286]: Timed out waiting for reply from 185.125.190.58:123 (ntp.ubuntu.com).
+2026-06-23T02:46:28.517213+00:00 thm-vm systemd-timesyncd[286]: Timed out waiting for reply from 91.189.91.157:123 (ntp.ubuntu.com).
+2026-06-23T02:46:38.767792+00:00 thm-vm systemd-timesyncd[286]: Timed out waiting for reply from 185.125.190.57:123 (ntp.ubuntu.com).
+2026-06-23T02:47:21.267265+00:00 thm-vm systemd-timesyncd[286]: Timed out waiting for reply from 185.125.190.57:123 (ntp.ubuntu.com).
+2026-06-23T02:47:31.517582+00:00 thm-vm systemd-timesyncd[286]: Timed out waiting for reply from 185.125.190.58:123 (ntp.ubuntu.com).
+2026-06-23T02:47:41.767240+00:00 thm-vm systemd-timesyncd[286]: Timed out waiting for reply from 185.125.190.56:123 (ntp.ubuntu.com).
+2026-06-23T02:47:52.017189+00:00 thm-vm systemd-timesyncd[286]: Timed out waiting for reply from 91.189.91.157:123 (ntp.ubuntu.com).
+2026-06-23T02:49:06.517811+00:00 thm-vm systemd-timesyncd[286]: Timed out waiting for reply from 185.125.190.56:123 (ntp.ubuntu.com).
+2026-06-23T02:49:16.767209+00:00 thm-vm systemd-timesyncd[286]: Timed out waiting for reply from 185.125.190.57:123 (ntp.ubuntu.com).
+2026-06-23T02:49:27.017203+00:00 thm-vm systemd-timesyncd[286]: Timed out waiting for reply from 185.125.190.58:123 (ntp.ubuntu.com).
+2026-06-23T02:49:37.267163+00:00 thm-vm systemd-timesyncd[286]: Timed out waiting for reply from 91.189.91.157:123 (ntp.ubuntu.com).
+2026-06-23T02:51:55.767467+00:00 thm-vm systemd-timesyncd[286]: Timed out waiting for reply from 185.125.190.58:123 (ntp.ubuntu.com).
+2026-06-23T02:52:06.017250+00:00 thm-vm systemd-timesyncd[286]: Timed out waiting for reply from 185.125.190.57:123 (ntp.ubuntu.com).
+2026-06-23T02:52:16.267565+00:00 thm-vm systemd-timesyncd[286]: Timed out waiting for reply from 91.189.91.157:123 (ntp.ubuntu.com).
+2026-06-23T02:52:26.518227+00:00 thm-vm systemd-timesyncd[286]: Timed out waiting for reply from 185.125.190.56:123 (ntp.ubuntu.com).
+ubuntu@thm-vm:/var/log$ ^C
+ubuntu@thm-vm:/var/log$ gerp -i yama syslog
+Command 'gerp' not found, did you mean:
+  command 'grep' from deb grep (3.11-3)
+Try: sudo apt install <deb name>
+ubuntu@thm-vm:/var/log$ grep -i yama syslog
+2025-08-13T13:41:48.176648+00:00 thm-vm kernel: LSM: initializing lsm=lockdown,capability,landlock,yama,apparmor,ima,evm
+2025-08-13T13:41:48.176653+00:00 thm-vm kernel: Yama: becoming mindful.
+2025-08-13T13:57:19.908951+00:00 thm-vm kernel: LSM: initializing lsm=lockdown,capability,landlock,yama,apparmor,ima,evm
+2025-08-13T13:57:19.908956+00:00 thm-vm kernel: Yama: becoming mindful.
+2025-08-28T14:02:07.691518+00:00 thm-vm kernel: LSM: initializing lsm=lockdown,capability,landlock,yama,apparmor,ima,evm
+2025-08-28T14:02:07.691523+00:00 thm-vm kernel: Yama: becoming mindful.
+2025-09-09T13:45:41.659295+00:00 thm-vm kernel: LSM: initializing lsm=lockdown,capability,landlock,yama,apparmor,ima,evm
+2025-09-09T13:45:41.659300+00:00 thm-vm kernel: Yama: becoming mindful.
+2026-06-23T02:46:03.772645+00:00 thm-vm kernel: LSM: initializing lsm=lockdown,capability,landlock,yama,apparmor,ima,evm
+2026-06-23T02:46:03.772650+00:00 thm-vm kernel: Yama: becoming mindful.
+ubuntu@thm-vm:/var/log$ grep sshd auth.log | grep -i failed
+2025-08-13T15:56:14.907700+00:00 thm-vm sshd[1176]: AuthorizedKeysCommand /usr/share/ec2-instance-connect/eic_run_authorized_keys root SHA256:FFqz/08WlHNaxbBkM/Fk8h8FEtwQjaUQVBJI8HnYpqY failed, status 22
+2025-08-13T15:56:18.903048+00:00 thm-vm sshd[1176]: Failed password for root from 10.14.94.82 port 57696 ssh2
+2025-08-13T15:56:31.754409+00:00 thm-vm sshd[1192]: Failed password for invalid user admin from 10.14.94.82 port 57697 ssh2
+2025-08-13T15:56:36.311951+00:00 thm-vm sshd[1192]: Failed password for invalid user admin from 10.14.94.82 port 57697 ssh2
+2025-08-13T15:56:47.119851+00:00 thm-vm sshd[1194]: Failed password for invalid user support from 10.14.94.82 port 57698 ssh2
+2025-08-13T15:56:51.194083+00:00 thm-vm sshd[1194]: Failed password for invalid user support from 10.14.94.82 port 57698 ssh2
+2025-08-13T15:56:58.160192+00:00 thm-vm sshd[1196]: AuthorizedKeysCommand /usr/share/ec2-instance-connect/eic_run_authorized_keys root SHA256:FFqz/08WlHNaxbBkM/Fk8h8FEtwQjaUQVBJI8HnYpqY failed, status 22
+2025-08-13T15:57:01.783976+00:00 thm-vm sshd[1196]: Failed password for root from 10.14.94.82 port 57700 ssh2
+2026-06-23T02:48:59.999090+00:00 thm-vm sshd[1348]: AuthorizedKeysCommand /usr/share/ec2-instance-connect/eic_run_authorized_keys ubuntu SHA256:eilD1YtOXVrptHfmsdDN/R34X0EvXHPTsK813c6S2F8 failed, status 22
+ubuntu@thm-vm:/var/log$ sudo last -f btmp
+root     ssh:notty    10.14.94.82      Wed Aug 13 15:57    gone - no logout
+support  ssh:notty    10.14.94.82      Wed Aug 13 15:56 - 15:57  (00:00)
+support  ssh:notty    10.14.94.82      Wed Aug 13 15:56 - 15:56  (00:00)
+support  ssh:notty    10.14.94.82      Wed Aug 13 15:56 - 15:56  (00:00)
+admin    ssh:notty    10.14.94.82      Wed Aug 13 15:56 - 15:56  (00:00)
+admin    ssh:notty    10.14.94.82      Wed Aug 13 15:56 - 15:56  (00:00)
+admin    ssh:notty    10.14.94.82      Wed Aug 13 15:56 - 15:56  (00:00)
+root     ssh:notty    10.14.94.82      Wed Aug 13 15:56 - 15:56  (00:00)
+
+btmp begins Mon Mar 19 16:44:48 1917
+ubuntu@thm-vm:/var/log$ gerp useradd auth.log
+Command 'gerp' not found, did you mean:
+  command 'grep' from deb grep (3.11-3)
+Try: sudo apt install <deb name>
+ubuntu@thm-vm:/var/log$ grep useradd auth.log
+2025-08-13T18:04:10.580438+00:00 thm-vm useradd[1451]: new group: name=xerxes, GID=1001
+2025-08-13T18:04:10.580683+00:00 thm-vm useradd[1451]: new user: name=xerxes, UID=1001, GID=1001, home=/home/xerxes, shell=/bin/sh, from=/dev/pts/1
+ubuntu@thm-vm:/var/log$ ^C
+ubuntu@thm-vm:/var/log$ cat /home/ubuntu/.bash_history
+sudo su
+sudo su
+sudo su
+sudo apt install zip unzip
+passwd
+
+ubuntu@thm-vm:/var/log$ grep unzip apt/histroy.log
+grep: apt/histroy.log: No such file or directory
+ubuntu@thm-vm:/var/log$ grep unzip histroy.log
+grep: histroy.log: No such file or directory
+ubuntu@thm-vm:/var/log$ vim /apt
+ubuntu@thm-vm:/var/log$ cd /apt
+-bash: cd: /apt: No such file or directory
+ubuntu@thm-vm:/var/log$ ls
+README            cloud-init-output.log  dmesg.4.gz  sysstat
+alternatives.log  cloud-init.log         dpkg.log    ubuntu-advantage.log
+amazon            dist-upgrade           journal     unattended-upgrades
+apport.log        dmesg                  kern.log    upgrade
+apt               dmesg.0                landscape   wtmp
+audit             dmesg.1.gz             lastlog
+auth.log          dmesg.2.gz             private
+btmp              dmesg.3.gz             syslog
+ubuntu@thm-vm:/var/log$ /apt
+-bash: /apt: No such file or directory
+ubuntu@thm-vm:/var/log$ cd apt
+ubuntu@thm-vm:/var/log/apt$ ls
+eipp.log.xz  history.log  term.log
+ubuntu@thm-vm:/var/log/apt$ grep unzip apthistroy.log
+grep: apthistroy.log: No such file or directory
+ubuntu@thm-vm:/var/log/apt$ grep unzip histroy.log
+grep: histroy.log: No such file or directory
+ubuntu@thm-vm:/var/log/apt$ grep unzip history.log
+Commandline: apt install zip unzip
+Install: zip:amd64 (3.0-13ubuntu0.2), unzip:amd64 (6.0-28ubuntu4.1)
+ubuntu@thm-vm:/var/log/apt$ cd ..
+ubuntu@thm-vm:/var/log$ sudo cat /root/.bash_history
+nano /etc/ssh/sshd_config
+exit
+ll -h /var/log
+echo "THM{note_to_remember}" >> notes.txt
+apt install auditd
+cd /etc/audit/
+ls
+cd rules.d/
+nano audit.rules 
+ll `which python3`
+systemctl restart auditd
+systemctl status auditd
+nano audit.rules 
+cd /etc/logrotate.d
+ls
+rm *
+exit
+ubuntu@thm-vm:/var/log$ ausearch -i -k file_thmsecret
+Error opening config file (Permission denied)
+NOTE - using built-in logs: /var/log/audit/audit.log
+----
+type=PROCTITLE msg=audit(08/13/25 13:41:41.595:56) : proctitle=/sbin/auditctl -R /etc/audit/audit.rules 
+type=CWD msg=audit(08/13/25 13:41:41.595:56) : cwd=/ 
+type=SOCKADDR msg=audit(08/13/25 13:41:41.595:56) : saddr={ saddr_fam=netlink nlnk-fam=16 nlnk-pid=0 } 
+type=SYSCALL msg=audit(08/13/25 13:41:41.595:56) : arch=x86_64 syscall=sendto success=yes exit=1084 a0=0x3 a1=0x7ffd77e095f0 a2=0x43c a3=0x0 items=1 ppid=293 pid=342 auid=unset uid=root gid=root euid=root suid=root fsuid=root egid=root sgid=root fsgid=root tty=(none) ses=unset comm=auditctl exe=/usr/sbin/auditctl subj=unconfined key=(null) 
+type=CONFIG_CHANGE msg=audit(08/13/25 13:41:41.595:56) : auid=unset ses=unset subj=unconfined op=add_rule key=file_thmsecret list=exit res=yes 
+----
+type=PROCTITLE msg=audit(08/13/25 13:57:13.530:51) : proctitle=/sbin/auditctl -R /etc/audit/audit.rules 
+type=CWD msg=audit(08/13/25 13:57:13.530:51) : cwd=/ 
+type=SOCKADDR msg=audit(08/13/25 13:57:13.530:51) : saddr={ saddr_fam=netlink nlnk-fam=16 nlnk-pid=0 } 
+type=SYSCALL msg=audit(08/13/25 13:57:13.530:51) : arch=x86_64 syscall=sendto success=yes exit=1084 a0=0x3 a1=0x7ffc0e38b1b0 a2=0x43c a3=0x0 items=1 ppid=281 pid=334 auid=unset uid=root gid=root euid=root suid=root fsuid=root egid=root sgid=root fsgid=root tty=(none) ses=unset comm=auditctl exe=/usr/sbin/auditctl subj=unconfined key=(null) 
+type=CONFIG_CHANGE msg=audit(08/13/25 13:57:13.530:51) : auid=unset ses=unset subj=unconfined op=add_rule key=file_thmsecret list=exit res=yes 
+----
+type=PROCTITLE msg=audit(08/13/25 18:36:54.574:1600) : proctitle=cat /secret.thm 
+type=CWD msg=audit(08/13/25 18:36:54.574:1600) : cwd=/root 
+type=SYSCALL msg=audit(08/13/25 18:36:54.574:1600) : arch=x86_64 syscall=openat success=yes exit=3 a0=AT_FDCWD a1=0x7ffd133b973a a2=O_RDONLY a3=0x0 items=1 ppid=1542 pid=1578 auid=ubuntu uid=root gid=root euid=root suid=root fsuid=root egid=root sgid=root fsgid=root tty=pts1 ses=30 comm=cat exe=/usr/bin/cat subj=unconfined key=file_thmsecret 
+ubuntu@thm-vm:/var/log$ ausearch -i -k proc_wget | grep github
+Error opening config file (Permission denied)
+NOTE - using built-in logs: /var/log/audit/audit.log
+type=PROCTITLE msg=audit(08/13/25 18:29:14.700:1523) : proctitle=wget https://github.com/projectdiscovery/naabu/releases/download/v2.3.5/naabu_2.3.5_linux_amd64.zip -O /tmp/naabu.zip 
+type=EXECVE msg=audit(08/13/25 18:29:14.700:1523) : argc=4 a0=wget a1=https://github.com/projectdiscovery/naabu/releases/download/v2.3.5/naabu_2.3.5_linux_amd64.zip a2=-O a3=/tmp/naabu.zip 
+ubuntu@thm-vm:/var/log$ ausearch -i -k proc_all | grep -i naabu
+Error opening config file (Permission denied)
+NOTE - using built-in logs: /var/log/audit/audit.log
+type=PROCTITLE msg=audit(08/13/25 18:29:25.214:1524) : proctitle=unzip naabu.zip 
+type=EXECVE msg=audit(08/13/25 18:29:25.214:1524) : argc=2 a0=unzip a1=naabu.zip 
+type=PROCTITLE msg=audit(08/13/25 18:29:45.152:1526) : proctitle=chmod +x naabu 
+type=EXECVE msg=audit(08/13/25 18:29:45.152:1526) : argc=3 a0=chmod a1=+x a2=naabu 
+type=PROCTITLE msg=audit(08/13/25 18:29:51.986:1527) : proctitle=./naabu -host 192.168.50.0/24 -top-ports  
+type=EXECVE msg=audit(08/13/25 18:29:51.986:1527) : argc=5 a0=./naabu a1=-host a2=192.168.50.0/24 a3=-top-ports a4=100 
+type=SYSCALL msg=audit(08/13/25 18:29:51.986:1527) : arch=x86_64 syscall=execve success=yes exit=0 a0=0x6252c36af5a0 a1=0x6252c36af630 a2=0x6252f61106d8 a3=0x8 items=2 ppid=1499 pid=1504 auid=ubuntu uid=root gid=root euid=root suid=root fsuid=root egid=root sgid=root fsgid=root tty=pts1 ses=30 comm=naabu exe=/tmp/naabu subj=unconfined key=proc_all 
+ubuntu@thm-vm:/var/log$ 
