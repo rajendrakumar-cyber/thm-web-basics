@@ -1,0 +1,83 @@
+
+This document contains detailed writeups, methodology, and flags for the three TryHackMe challenges completed: **A Letter**, **Water Bottle**, and **Dev Diaries**.
+
+---
+
+## 1. Challenge: A Letter (OSINT / Forensics)
+
+### **Scenario Overview**
+We analyzed a water-damaged envelope (`letter.png`), a torn French newspaper clipping (`Newspaper_clipping.png`), and a handwritten personal note (`Note.txt`) to identify a brave young ancestor.
+
+### **Methodology & Key Steps**
+1. **Dating the Newspaper Clipping:**
+   * The clipping comes from the regional French newspaper *L'Ouest-Éclair*.
+   * It mentions Roald Amundsen's North Pole flights, events in Morocco (Rif War), and politicians Painlevé and Herriot, pointing to **May 1925**.
+   * The text describes a major maritime disaster in Finistère on **May 23, 1925**, where rescue boats from Kérity and Saint-Pierre capsized.
+2. **Decoding the Envelope Barcode:**
+   * The fluorescent orange barcode at the bottom of the envelope is used by the French postal service (*La Poste*).
+   * Decoding the barcode (reading from right to left/reverse) reveals the postal code **29760**, corresponding to **Penmarc'h** in Brittany, France.
+3. **Identifying the Hero:**
+   * The handwritten note is addressed to **Édouard** (Édouard Gourlaouen) from Audette.
+   * It notes that his great-grandfather was the youngest member (*"le benjamin"*) of the rescue crew and was under the age of 18 (too young to get a driver's license).
+   * Historical records for the May 23, 1925 disaster list a 15-year-old cabin boy (*mousse*) named **Yves-Marie Gourlaouen** aboard the rescue vessel *Arche d'Alliance*, who was awarded a silver medal for bravery.
+
+> [!NOTE]
+> **Flag Format:** `THM{Name_Surname_age}`  
+> **Flag:** `THM{Yves-Marie_Gourlaouen_15}`
+
+---
+
+## 2. Challenge: Water Bottle (OSINT)
+
+### **Scenario Overview**
+We needed to locate a defunct water refilling station near Boni Avenue, Mandaluyong, Philippines, that closed down around 2014, and recover its 12-digit contact number starting with `63922`.
+
+### **Methodology & Key Steps**
+1. **Historical Street View Analysis:**
+   * Navigating to Boni Avenue on Google Maps/Google Earth and setting the Street View timeline to **2014** reveals the business that occupied the location of a modern station.
+   * The defunct business was identified as **Aquabest**.
+2. **Retrieving Contact Information:**
+   * The signage on the historic 2014 Street View captured a contact mobile number: `0922-872-1288`.
+3. **Formatting the Flag:**
+   * Converting the standard Philippine mobile number `09228721288` to the international format requested (`63922...`) yields `639228721288`.
+
+> [!IMPORTANT]
+> **Flag Format:** `THM{Water Station name in lowercase + _ + Contact Number}`  
+> **Flag:** `THM{aquabest_639228721288}`
+
+---
+
+## 3. Challenge: Dev Diaries (Git / Code Forensics)
+
+### **Scenario Overview**
+We cloned a GitHub repository for an abandoned website project (`marvenly_site`) and audited its commit history to find a hidden flag left behind by the developer.
+
+### **Methodology & Key Steps**
+1. **Cloned the Repository:**
+   ```bash
+   git clone https://github.com/notvibecoder23/marvenly_site/
+   cd marvenly_site/
+   ```
+2. **Inspected Git Logs:**
+   We audited the commit messages to identify where files might have been wiped or modified:
+   ```bash
+   git log --oneline
+   ```
+   * *Commits found:*
+     * `7a7090d` Parking the domain until the issue is solved
+     * `88baf1d` The project was marked as abandoned due to a payment dispute
+     * `33c59e5` Removed my signature, ready for deployment (Target commit)
+     * `e9ce1ce` Initial commit of the landing page
+3. **Checked out target commits & searched for flag:**
+   We switched to the commit before the signature was removed:
+   ```bash
+   git checkout 33c59e5feedcbcbfee7a1f6d3a435225698f616f
+   grep -r "THM{" .
+   ```
+   * This returned the following commented line in `index.html`:
+     `<!-- removed the signature, but I'm leaving something as my hidden signature THM{g1t_h1st0ry_n3v3r_f0rg3ts} -->`
+
+> [!TIP]
+> Git never forgets! Using `git checkout` to step back to previous commits is a core technique in source control forensics.  
+> **Flag:** `THM{g1t_h1st0ry_n3v3r_f0rg3ts}`
+                                          
