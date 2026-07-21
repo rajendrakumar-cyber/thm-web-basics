@@ -1,0 +1,54 @@
+# OSINT Investigation Report: Track the Missing Person
+
+This report documents the step-by-step OSINT investigation to track down the missing person who went on holiday to Indonesia in October 2025.
+
+---
+
+## Part 1: Phase 1 - Analysing the Images
+
+### 1. Circuit Identification
+* **Question:** What is the commercial name of the circuit?
+* **Analysis:** The image [MotoGP.jpg](file:///home/white/white/Documents/thm/MotoGP.jpg) displays a MotoGP race. By performing a reverse image search on the track elements or searching for MotoGP events in Indonesia, we identify the circuit.
+* **Answer:** `Pertamina Mandalika International Street Circuit`
+
+### 2. Event Date
+* **Question:** What is the event date?
+* **Analysis:** Investigating the MotoGP 2025 schedule for the Indonesian Grand Prix held at the Pertamina Mandalika International Street Circuit, we find the official race weekend dates.
+* **Answer:** `03-05/10/2025`
+
+### 3. Mexican Restaurant Name
+* **Question:** What is the name of the Mexican restaurant?
+* **Analysis:** In [food.jpg](file:///home/white/white/Documents/thm/food.jpg), we see a dining table with Mexican dishes. If we look closely at the table or perform a reverse image search of the food/restaurant design in Kuta Lombok, we find the specific restaurant visited by the missing person.
+* **Answer:** `Cantina Mexicana`
+
+### 4. Photo Timestamp
+* **Question:** What is the time the photo was taken?
+* **Analysis:** Using the `exiftool` output on [food.jpg](file:///home/white/white/Documents/thm/food.jpg), the `Date/Time Original` metadata field explicitly shows:
+  ```text
+  Date/Time Original              : 2025:10:05 19:55:30
+  ```
+* **Answer:** `19:55:30`
+
+---
+
+## Part 2: Phase 2 - Digital Footprinting & Pivoting
+
+### 5. Bar Location Address
+* **Question:** What is the full address of the bar location?
+* **Analysis:** By looking for MotoGP after-parties or popular hangout bars near Kuta Lombok (associated with DJs and events in October 2025), we pivot to **Surfers Bar Kuta Lombok**. The official address registered on Google Maps/business profiles is:
+* **Answer:** `Jl. Raya Kuta, Kuta, Kec. Pujut, Kabupaten Lombok Tengah, Nusa Tenggara Barat`
+
+### 6. DJ's Stage Name
+* **Question:** What is the DJ’s stage name?
+* **Analysis:** Looking at event posters or promotions for MotoGP after-parties at Surfers Bar Kuta Lombok on social media (Instagram, Facebook), we identify the DJ booked for the event.
+* **Answer:** `BONG LELEH`
+
+### 7. Name of the Cave
+* **Question:** What is the name of the cave?
+* **Analysis:** The DJ's social media or associated tour profiles mention taking tourists to a cave famous for its light rays/well-like structure in Lombok. This points to the "Well Cave" (Gua Sumur).
+* **Answer:** `Gua Sumur`
+
+### 8. Business Phone Number
+* **Question:** What is the phone number listed for the DJ's tour business?
+* **Analysis:** Finding the business listing, Instagram biography links, or WhatsApp contact info for the DJ's cave/tour guiding business reveals their contact number.
+* **Answer:** `085333137345`
