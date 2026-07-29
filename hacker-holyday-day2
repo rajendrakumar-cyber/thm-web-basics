@@ -1,0 +1,24 @@
+# Notes — TryHackMe SOC-Labs
+
+## 1. Exposed Git Directory Recovery (Room 404)
+We extracted the git metadata recursively from `http://10.49.153.102:8080/.git/` and reconstructed the repository under `byte_lotus_git/`.
+
+* **Commit Author:** `night-shift <dev@byte-lotus.internal>`
+* **Staging Flag:** `THM{byt3_l0tus_n3v3r_f0rg3ts}` (found in [README.md](file:///home/white/white/Documents/thm/regex/byte_lotus_git/README.md))
+
+---
+
+## 2. Regular Expressions & Log Analysis Workspace
+The workspace also contains log files commonly used in Intro to Log Analysis / Regular Expressions rooms:
+
+* **[emails.log](file:///home/white/white/Documents/thm/regex/emails.log):** List of email addresses.
+* **[apache-ex2.log](file:///home/white/white/Documents/thm/regex/apache-ex2.log):** Apache access logs.
+
+### Useful Regex Cheatsheet for Log Parsing
+
+| Target | Regex Pattern | Example Command |
+| :--- | :--- | :--- |
+| **Specific Blog Posts** (e.g., posts 22-26) | `post=2[2-6]` | `grep -E 'post=2[2-6]' apache-ex2.log` |
+| **All .php endpoints** | `\.php` | `grep -E '\.php' apache-ex2.log` |
+| **IP Addresses** | `^([0-9]{1,3}\.){3}[0-9]{1,3}` | `grep -E '^([0-9]{1,3}\.){3}[0-9]{1,3}' apache-ex2.log` |
+| **Email Domains** | `@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}` | `grep -E '@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}' emails.log` |
