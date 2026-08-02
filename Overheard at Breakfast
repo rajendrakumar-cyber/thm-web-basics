@@ -1,0 +1,40 @@
+# OSINT Challenge Notes: Overheard at Breakfast
+
+## 1. Analysis of conversation.png
+The conversation screenshot between **Ponzi** and **Lambo** reveals:
+* **Target Email:** `lambobytelotushotel@gmail.com`
+* **Target Platform:** A free profile-linking tool starting with **G** (identified as **Gravatar**).
+
+## 2. Methodology & Hashing
+Gravatar associates profiles with email addresses using hashes. 
+We normalized the email (lowercase, stripped whitespace) and calculated its MD5 and SHA-256 hashes:
+* **Email:** `lambobytelotushotel@gmail.com`
+* **MD5 Hash:** `d4a5fc5d3128890778667e24617d7cc0`
+* **SHA-256 Hash:** `d43faafe9d7f056793bd037b8d6e321acad985c222d83775b10d6539e301e931`
+
+## 3. Querying Gravatar API
+We queried the Gravatar JSON endpoint at:
+`https://en.gravatar.com/d4a5fc5d3128890778667e24617d7cc0.json`
+
+The JSON response returned:
+```json
+{
+  "entry": [
+    {
+      "hash": "d4a5fc5d3128890778667e24617d7cc0",
+      "requestHash": "d4a5fc5d3128890778667e24617d7cc0",
+      "profileUrl": "https://gravatar.com/cheerfullysongf28e3c3716",
+      "preferredUsername": "cheerfullysongf28e3c3716",
+      "displayName": "Lambo",
+      "aboutMe": "Funny thing about email hashes, they follow you places you didn't expect. Glad you found the right corner of the internet! Here is your prize: VEhNe1MzY3JlVF9QcjBmaWwzX0g0c19iMzNuX0lkZW50MWZpM2R9"
+    }
+  ]
+}
+```
+
+## 4. Decoding the Flag
+The `aboutMe` field contains a Base64-encoded string:
+`VEhNe1MzY3JlVF9QcjBmaWwzX0g0c19iMzNuX0lkZW50MWZpM2R9`
+
+Decoding the string yields the flag:
+`THM{S3creT_Pr0fil3_H4s_b33n_Ident1fi3d}`
