@@ -1,0 +1,119 @@
+# Forensic Analysis & Solution Guide: "After Hours"
+### Challenge: TryHackMe — Hacker Holidays 2026 (Medium Forensics)
+
+This document provides a detailed write-up of the forensic steps required to investigate the WMI repository persistence mechanism, extract the hidden .NET payload, and decode the embedded flag.
+
+---
+
+## 1. Challenge & Environment Overview
+
+- **Artifacts Provided:** 
+  - `OBJECTS.DATA` (24 MB) — Contains WMI class definitions, instances, and property values.
+  - `INDEX.BTR` (5 MB) — B-tree indexes for fast lookups.
+  - `MAPPING1.MAP`, `MAPPING2.MAP`, `MAPPING3.MAP` — Correlates the indices to raw offsets.
+- **Scenario:** Unauthorized access occurs during off-hours, but standard persistence locations (Startup, Registry Run keys, Scheduled Tasks) show no signs of compromise.
+- **Hypothesis:** Persistence is achieved via **Windows Management Instrumentation (WMI) event subscriptions**, using custom namespaces/classes to house the payload.
+
+---
+
+## 2. Walkthrough & Execution Steps
+
+### Step 1: Locating the Custom WMI Class
+A standard autorun analysis tool might miss custom WMI classes created purely to store payloads. To identify the class name, we search the `OBJECTS.DATA` binary file for WMI structures.
+
+The target class is identified as `Win32_HardwareTelemetry`, which masquerades as a hardware logging service in the `ROOT\cimv2` namespace. It contains a suspicious property named `ConfigData`.
+
+```bash
+# Verify the class presence in OBJECTS.DATA using grep or strings
+strings OBJECTS.DATA | grep -i "Telemetry"
+```
+
+### Step 2: Extracting the Payload
+The `ConfigData` property holds the payload as a Base64-encoded, DEFLATE-compressed string. 
+
+Use the following Python script (`extract_payload.py`) to search `OBJECTS.DATA` for the payload offset, extract the base64 string, decode it, and decompress it using a raw DEFLATE decompressor (using a window size of `-15` to skip zlib headers):
+
+```python
+import base64
+import zlib
+import re
+
+objects_data_path = "OBJECTS.DATA"
+pattern = b"7VZPbFR" # Beginning signature of the Base64 stream
+
+with open(objects_data_path, "rb") as f:
+    data = f.read()
+
+# Locate the Base64 block signature
+match = re.search(pattern, data)
+if not match:
+    print("[-] Base64 payload signature not found in OBJECTS.DATA")
+    exit(1)
+
+# Extract subsequent Base64 characters
+offset = match.start()
+extracted_chars = []
+for i in range(offset, len(data)):
+    char = chr(data[i])
+    if char in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01233456789+/=\r\n":
+        extracted_chars.append(char)
+    else:
+        break
+
+b64_str = "".join(extracted_chars).replace("\n", "").replace("\r", "")
+print(f"[+] Extracted Base64 payload (Length: {len(b64_str)} characters)")
+
+# Decode Base64
+compressed_payload = base64.b64decode(b64_str)
+
+# Decompress using raw DEFLATE (wbits = -15)
+try:
+    decompressed = zlib.decompress(compressed_payload, -15)
+    output_path = "updates.exe"
+    with open(output_path, "wb") as out:
+        out.write(decompressed)
+    print(f"[+] Successfully decompressed payload to '{output_path}' ({len(decompressed)} bytes)")
+except Exception as e:
+    print(f"[-] Decompression failed: {e}")
+```
+
+### Step 3: Identifying the Decompressed Payload
+Running a file type check on the decompressed binary `updates.exe` reveals:
+```bash
+file updates.exe
+# Output: PE32 executable for MS Windows (GUI), Intel i386 Mono/.Net assembly
+```
+
+### Step 4: Extracting the Flag
+Because `.NET` strings are stored in UTF-16 little-endian format, standard ASCII string dumps will miss them. Run the `strings` command with the `-e l` option to scan for little-endian strings:
+
+```bash
+strings -e l updates.exe
+```
+
+Look for suspicious lines in the output:
+```cmd
+bytelotusdc
+cmd.exe
+/c net user patch VEhNe1A0dGNoX29wM25lZF90aDNfQmFjS2QwMHJ9 /add
+```
+
+The malware attempts to add a back-door local administrator user named `patch` with a Base64-encoded password: `VEhNe1A0dGNoX29wM25lZF90aDNfQmFjS2QwMHJ9`.
+
+### Step 5: Decoding the Password
+Decode the password string to recover the challenge flag:
+
+```bash
+echo "VEhNe1A0dGNoX29wM25lZF90aDNfQmFjS2QwMHJ9" | base64 -d
+# Output: THM{P4tch_op3ned_th3_BacKd00r}
+```
+
+---
+
+## 3. Key Takeaways & Defense Recommendations
+
+> [!NOTE]
+> **WMI Repository Persistence** is highly effective because standard tools (like Sysinternals Autoruns) may not perform deep registry/repository structure searches for custom namespaces or non-standard class properties.
+
+*   **Detection:** Monitor WMI Repository modifications (`C:\Windows\System32\wbem\Repository\OBJECTS.DATA` file writes) or use PowerShell cmdlets like `Get-CimInstance` to audit custom WMI classes.
+*   **Analysis:** When dealing with WMI-stored binaries, always look for Base64 and compression pipelines (`Base64 -> Deflate -> Memory Injection`) commonly used by fileless malware loaders.
