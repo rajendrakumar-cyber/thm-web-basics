@@ -1,0 +1,175 @@
+# Vera's Laptop Forensics: Step-by-Step Solving Guide
+
+This guide outlines the step-by-step forensic investigation of the triaged Windows laptop to locate and decrypt the hidden VeraCrypt container, ultimately revealing the flag: `THM{1t_w4s_V3r4_A11_Al0ng?!}`.
+
+---
+
+## 🛠️ Prerequisites & Setup
+The investigation was performed on a Linux system using local forensic tools and Python. Ensure you have the following packages installed:
+*   **Impacket** (`impacket-secretsdump`, `impacket-dpapi`)
+*   **Cryptsetup** (supporting TCRYPT/VeraCrypt mode)
+*   **7-Zip** (`7z`)
+*   **poppler-utils** (`pdfimages`)
+*   **Python 3** with the `cryptography` library
+
+---
+
+## Step 1: Registry Hive Analysis & Password Extraction
+First, check for local account secrets saved within the Windows registry hives (`SAM`, `SYSTEM`, `SECURITY`).
+
+```bash
+impacket-secretsdump -sam KAPE/C/Windows/System32/config/SAM \
+                     -system KAPE/C/Windows/System32/config/SYSTEM \
+                     -security KAPE/C/Windows/System32/config/SECURITY LOCAL
+```
+
+### Key Finding
+The dump retrieves LSA Secrets containing a default password for the user account:
+*   **Password:** `minivera`
+*   **Target User SID:** `S-1-5-21-2529683458-431225740-1723070931-1000`
+
+---
+
+## Step 2: Decrypting the Windows DPAPI Master Key
+Google Chrome encrypts its encryption keys via Windows DPAPI. We need to decrypt the user's DPAPI Master Key file.
+
+*   **Master Key Path:** `KAPE/C/Users/vera/AppData/Roaming/Microsoft/Protect/S-1-5-21-2529683458-431225740-1723070931-1000/c90719ef-5b98-474e-b934-136d606a702a`
+*   **Command to Decrypt:**
+    ```bash
+    impacket-dpapi masterkey -file "KAPE/C/Users/vera/AppData/Roaming/Microsoft/Protect/S-1-5-21-2529683458-431225740-1723070931-1000/c90719ef-5b98-474e-b934-136d606a702a" \
+                             -sid "S-1-5-21-2529683458-431225740-1723070931-1000" \
+                             -password "minivera"
+    ```
+
+### Key Finding
+The command successfully decrypts the DPAPI Master Key:
+*   **Master Key:** `0x5e5715ec9b6df5a86e97902692a66d28e691f05d5bc1e04d0159cfe960e94c978c07e5004a0179d3a96df2468885a28175b0b02cc064445f116a752d2b3e9d40`
+
+---
+
+## Step 3: Decrypting the Chrome Encryption Key
+Chrome stores its encrypted master key inside the `Local State` file. We need to decode it, strip Chrome's custom metadata header, and decrypt it.
+
+1.  **Extract and Decode Base64 Key:**
+    Grab the `os_crypt.encrypted_key` string from `KAPE/C/Users/vera/AppData/Local/Google/Chrome For Testing/User Data/Local State` and decode it:
+    ```bash
+    echo -n "<BASE64_STRING>" | base64 -d > chrome_key.enc
+    ```
+2.  **Strip the "DPAPI" Signature Header:**
+    Chrome prepends the ASCII string `DPAPI` (5 bytes) to the blob. Strip it to get the raw DPAPI block:
+    ```bash
+    tail -c +6 chrome_key.enc > chrome_key_stripped.enc
+    ```
+3.  **Decrypt Key:**
+    Use `impacket-dpapi` to decrypt the stripped key using the master key from Step 2:
+    ```bash
+    impacket-dpapi unprotect -file chrome_key_stripped.enc \
+                             -key 0x5e5715ec9b6df5a86e97902692a66d28e691f05d5bc1e04d0159cfe960e94c978c07e5004a0179d3a96df2468885a28175b0b02cc064445f116a752d2b3e9d40
+    ```
+
+### Key Finding
+*   **Decrypted Chrome AES Key (256-bit):** `206a39a0971327ea9487e4aea9844f5d3670162456982276939a712646da0b02`
+
+---
+
+## Step 4: Extracting and Decrypting Stored Passwords
+Chrome passwords are saved in the SQLite database file: `KAPE/C/Users/vera/AppData/Local/Google/Chrome For Testing/User Data/Default/Login Data`.
+
+1.  **Extract Encrypted Password:**
+    Query the database for stored logins:
+    ```sql
+    SELECT origin_url, username_value, password_value FROM logins;
+    ```
+    *   **Username:** `VeraSecretVault`
+    *   **Encrypted Pass (Hex):** `763130c88a72a64f35f63e883ea0a7f64a6870e46b0bbb469a756eda88b7e324c3e1c51015aa6fd8d65ac48961e1ea324ce1707807feb3d7`
+
+2.  **Decrypt Password with AES-GCM:**
+    The password is GCM-encrypted. The byte structure is:
+    *   `v10` signature: First 3 bytes (`763130` in hex)
+    *   Initialization Vector (IV): Next 12 bytes
+    *   Ciphertext and 16-byte Auth Tag: Remaining bytes
+    
+    Run the following Python script to decrypt it:
+    ```python
+    from Crypto.Cipher import AES
+    import binascii
+
+    key = binascii.unhexlify("206a39a0971327ea9487e4aea9844f5d3670162456982276939a712646da0b02")
+    pass_bytes = binascii.unhexlify("763130c88a72a64f35f63e883ea0a7f64a6870e46b0bbb469a756eda88b7e324c3e1c51015aa6fd8d65ac48961e1ea324ce1707807feb3d7")
+
+    iv = pass_bytes[3:15]
+    ciphertext_with_tag = pass_bytes[15:]
+    ciphertext = ciphertext_with_tag[:-16]
+    tag = ciphertext_with_tag[-16:]
+
+    cipher = AES.new(key, AES.MODE_GCM, nonce=iv)
+    decrypted = cipher.decrypt_and_verify(ciphertext, tag)
+    print("Decrypted password:", decrypted.decode("utf-8"))
+    ```
+
+### Key Finding
+*   **Decrypted Password:** `Wh4t1sV3raD0inG0nTh1sH0st`
+
+---
+
+## Step 5: Decrypting the VeraCrypt Volume
+Vera leaves behind a raw encrypted backup container at `KAPE/C/Users/vera/Documents/backup`.
+
+1.  **Extract Container Master Key:**
+    Using `cryptsetup`, dump the underlying 512-bit VeraCrypt master key for the container:
+    ```bash
+    echo "Wh4t1sV3raD0inG0nTh1sH0st" | cryptsetup tcryptDump --dump-master-key KAPE/C/Users/vera/Documents/backup
+    ```
+    *   **VeraCrypt Master Key (512-bit):** `d2ae7b9eb713de4852c4fdb060898e2c610896ca5b2f2f14794e066e420429ceecb2f062e8f8569492e2dc526ee6cd4215d8434d2eef074aa2e54f296c3bbaac`
+    *   **Payload Offset:** Sector 256 (131072 bytes)
+    *   **Cipher Mode:** `xts-plain64` (AES-XTS)
+
+2.  **Decrypt Container in User Space:**
+    Since root access (sudo) may not be available to mount loop devices, execute a Python script to decrypt the sector-by-sector AES-XTS payload starting at sector 256:
+    ```python
+    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+    import struct
+
+    key = bytes.fromhex("d2ae7b9eb713de4852c4fdb060898e2c610896ca5b2f2f14794e066e420429ceecb2f062e8f8569492e2dc526ee6cd4215d8434d2eef074aa2e54f296c3bbaac")
+
+    with open("KAPE/C/Users/vera/Documents/backup", "rb") as f_in, open("decrypted.img", "wb") as f_out:
+        f_in.seek(131072)  # Skip VeraCrypt header area (128 KiB)
+        sector_idx = 256
+        chunk_size = 1024 * 512 # 512 KiB buffer
+        
+        while True:
+            data = f_in.read(chunk_size)
+            if not data:
+                break
+            decrypted_chunk = bytearray()
+            for i in range(0, len(data), 512):
+                sector_data = data[i:i+512]
+                tweak = struct.pack("<Q", sector_idx) + b"\x00" * 8
+                cipher = Cipher(algorithms.AES(key), modes.XTS(tweak))
+                decryptor = cipher.decryptor()
+                decrypted_chunk.extend(decryptor.update(sector_data) + decryptor.finalize())
+                sector_idx += 1
+            f_out.write(decrypted_chunk)
+    ```
+
+---
+
+## Step 6: File Extraction & Flag Discovery
+The decrypted `decrypted.img` contains a standard FAT32 filesystem.
+
+1.  **Extract Files with 7-Zip:**
+    ```bash
+    7z x decrypted.img
+    ```
+2.  **Locate Target Invoice:**
+    Inside `secret_financial_documents`, find:
+    `secret_financial_documents/important_invoice_byte_lotus.pdf`
+3.  **Extract and View Image:**
+    Extract images from the PDF page using `pdfimages`:
+    ```bash
+    pdfimages -png secret_financial_documents/important_invoice_byte_lotus.pdf secret_financial_documents/extracted_img
+    ```
+    Open `secret_financial_documents/extracted_img-000.png` to find the invoice with the line item containing the flag:
+
+    **Flag: THM{1t_w4s_V3r4_A11_Al0ng?!}**
+                                                                          
