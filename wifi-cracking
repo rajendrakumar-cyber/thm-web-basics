@@ -1,0 +1,66 @@
+Reconnaissance is finished. The card began in managed mode with no picture of the airspace, and the room ended with a map of every network at the site, the clients attached to each and the names those clients still call out for while attached to nothing.
+
+The work behind it breaks down as follows:
+
+Preparing the interface: airmon-ng check kill stopped NetworkManager, wpa_supplicant and the other interfering processes, then airmon-ng start wlan0 created wlan0mon, confirmed by type monitor in iw dev.
+Sweeping both bands: airodump-ng --band bg wlan0mon catalogued 2.4 GHz, and since the enterprise networks sit on channel 44, airodump-ng --band a -c 44 wlan0mon reached those separately, leaving the 88:15:44:* rows out of scope.
+Classifying each network: The ENC, CIPHER and AUTH columns put Guest-WiFi at OPN, Home-Legacy at WEP, Home-2G at WPA2 PSK, Mgmt-WiFi and IT-Admin both at SAE and the channel 44 enterprise networks at MGT with FreeConnect at OWE.
+Reading the station list: The lower section tied clients to access points, three of them to Guest-WiFi, while the (not associated) rows caught B4:99:BA:6F:F9:45 probing for Office-WiFi and Jason, names nothing was broadcasting.
+Uncovering the hidden SSID: F0:9F:C2:6A:88:26 beaconed on channel 11 as <length: 9> with no client to deauthenticate, so mdk4 wlan0mon p -t F0:9F:C2:6A:88:26 -f /home/user/wordlists/ssid-names.txt probed it until it answered to Staff-Net, and wpa_supplicant then joined it on wlan1 with scan_ssid=1.
+None of it required transmitting anything of consequence, and that is the point. Two properties of 802.11 did the work, the first being that access points announce themselves continuously in beacons and the second that management frames travel in the clear without authentication. The one network that tried to withhold its name resisted the first and fell to the second. Everything gathered here, the ENC, CIPHER and AUTH values that classify each network, the stations shown associated in the lower section and the probed names with no matching access point, is what the attacks in the rooms ahead select their targets from. Observation never touches a network, but it decides which attack each network is open to, and that judgement is the whole value of the phase.
+
+What's Next
+Most of the configurations catalogued here are attacked in the rooms that follow, where observation gives way to access.
+
+Attacking Open and WPA2-PSK Networks (coming soon) takes on the two commonest configurations, bypassing a captive portal on an open network and then capturing and cracking a WPA2 four-way handshake in order to join as a legitimate client.
+Attacking WPA3 and Rogue Access Points (coming soon) covers what happens once the offline crack stops working, including the downgrade back to WPA2 and the evil twin.
+Attacking Enterprise Wi-Fi and Attacking Weak and Misconfigured EAP (both coming soon) go after the MGT networks, the first with a rogue RADIUS server that captures and relays credentials, the second with EAP itself, where EAP-MD5 is read off the air and EAP-TLS holds until its certificate authority is robbed.
+Attacking Legacy Wi-Fi and Attacking OWE and the 6 GHz Band (both coming soon) take the two extremes of the sweep, recovering the WEP key behind Home-Legacy and joining FreeConnect without a password.
+Before moving on, it is worth running the sweep again and reading the output cold, without the walkthrough alongside it. Pick a network off the list and say what its ENC, CIPHER and AUTH values commit an attacker to, then check the Probes column for a name no access point is broadcasting. Being able to do that at a glance turns the rooms ahead into a choice of attack rather than a set of instructions.┌──(white㉿white)-[~/…/Music/PICO-CTF/picoctfAI/fornsicis]
+└─$ aircrack-ng -w /usr/share/wordlists/rockyou.txt wpa-ing_out.pcap                  
+
+
+Reading packets, please wait...
+Opening wpa-ing_out.pcap
+Resetting EAPOL Handshake decoder state.
+Resetting EAPOL Handshake decoder state.
+Read 23523 packets.
+
+   #  BSSID              ESSID                     Encryption
+
+   1  00:5F:67:4F:6A:1A  Gone_Surfing              WPA (1 handshake)
+
+Choosing first network as target.
+
+Reading packets, please wait...
+Opening wpa-ing_out.pcap
+Resetting EAPOL Handshake decoder state.
+Resetting EAPOL Handshake decoder state.
+Read 23523 packets.
+
+1 potential targets
+
+
+                               Aircrack-ng 1.7 
+
+      [00:00:00] 1221/10303727 keys tested (4551.96 k/s) 
+
+      Time left: 37 minutes, 43 seconds                          0.01%
+
+                          KEY FOUND! [ mickeymouse ]
+
+
+      Master Key     : 61 64 B9 5E FC 6F 41 70 70 81 F6 40 80 9F AF B1 
+                       4A 9E C5 C4 E1 67 B8 AB 58 E3 E8 8E E6 66 EB 11 
+
+      Transient Key  : 89 F6 77 00 A8 EC 4A 00 00 00 00 00 00 00 00 00 
+                       00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+                       00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+                       00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+
+      EAPOL HMAC     : 65 2F 6C 0E 75 F0 49 27 6A AA 6A 06 A7 24 B9 A9 
+
+
+                                                                                                                                                                      
+┌──(white㉿white)-[~/…/Music/PICO-CTF/picoctfAI/fornsicis]
+└─$
