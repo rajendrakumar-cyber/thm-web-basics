@@ -1,0 +1,29 @@
+Operation Slither (THM) — Done
+Social media trail. Google username → X → Threads replies → Base64. Then Threads → Instagram → SoundCloud → Base64. Then SoundCloud likes → GitHub commits → Base64. Just browser + CyberChef.
+
+The Cod Caper (THM) — Paused
+Scanned my own AttackBox by mistake. Need the actual target IP from the room. Next: nmap -sC -sV -A -p 1-1000 <target>.
+
+Layover (HTB) — Stuck
+RDP in with xfreerdp. Got root on the box. Two wlan interfaces, SSID is "HTB International WiFi". Password NOT in /etc/wpa_supplicant/ (those are default Ubuntu scripts). Need to find the PSK somewhere else — browser history, home dir files, or capture traffic in monitor mode. Terminal paste is broken (inserts ^[[200~), so I have to type everything manually.
+
+Next move: cat /etc/wpa_supplicant/action_wpa.sh (type it, don't paste).
+
+picoCTF 2021 Forensics — 5 in a row
+Milkslap — Tall PNG (1280×47520). zsteg crashed with stack overflow. Fix: export RUBY_THREAD_VM_STACK_SIZE=500000000. Flag in blue channel LSB.
+
+MacroHard WeakEdge — .pptm is just a ZIP. unzip → ppt/slideMasters/hidden → remove spaces → base64 -d.
+
+Matryoshka Doll — Nested ZIPs inside PNGs. unzip 4 times → flag.txt.
+
+tunn3l v1s10n — BMP with 3 corrupted header fields (offset, DIB size, height). Fixed with Python struct.pack_into. Height was 306, should be 850. "Tunnel vision" = narrow strip.
+
+Wireshark twoo twooo — DNS tunneling. Filter: dns and ip.dst==18.217.1.57. Subdomains are base64 chunks. Concatenate in order → decode. Decoy flags everywhere, only the DNS ones matter.
+
+Key takeaways
+.pptm / .xlsx / .docx = ZIP. Always unzip first.
+zsteg crashes on tall images → increase Ruby stack.
+DNS tunneling = filter by destination IP, extract subdomains, base64.
+BMP header: offset at 0x0A, DIB size at 0x0E, height at 0x16.
+HTB RDP terminals eat pasted text. Type manually.
+/etc/wpa_supplicant/functions.sh is 25KB of generic Ubuntu code. The actual config is in action_wpa.sh or ifupdown.sh.
