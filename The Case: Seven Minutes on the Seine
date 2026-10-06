@@ -1,0 +1,25 @@
+Seven Minutes on the Seine — Quick Reference
+Task 1: Seine Incident
+#	Answer
+1	PORTE_DES_LIONS-22_OCT_2024
+2	MV1024-BAPST-AFFECTE-1887-NON_EXPOSE
+3	2025/359.1,2025/359.5
+4	APOLLON_VAINQUEUR-INV_3818-8mx7.5m
+5	PONT_ROYAL
+
+Flag 1: THM{n1c3_h31st_r3s34rch}
+
+Task 2: Louvre Protocol (CCTV)
+Step	Action
+1	Start lab machine (wait 2–3 min)
+2	Open the portal link
+3	Login → username: louvre / password: louvre
+4	Find the date filter on the dashboard
+5	Set date to 19 October 2025
+6	Click Load / Apply
+7	Flag appears (cameras flip to ALERT)
+
+Flag 2: THM{cctv_4ud1ts_4r3_fun}
+
+Source: CNN (Nov 6, 2025) citing 2014 ANSSI audit — password was the museum name in lowercase.
+
