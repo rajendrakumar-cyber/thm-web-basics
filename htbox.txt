@@ -1,0 +1,60 @@
+Notes: VM Forensics with guestfish
+What is guestfish?
+A command-line tool from libguestfs that lets you mount and explore virtual machine disk images without booting the VM. Think of it as mount + ls + cat for .vmdk / .qcow2 / .img files.
+
+Command-by-Command Breakdown
+Command	Explanation
+sudo guestfish --ro -a HSBox2-disk001.vmdk	Opens the VMDK disk in read-only mode (--ro). -a = add appliance. sudo needed because it uses QEMU under the hood.
+><fs> run	Boots the internal QEMU appliance and scans the disk for partitions/filesystems.
+><fs> list-filesystems	Shows all detected partitions and their filesystem types. Output: /dev/sda1: ext4, /dev/sda5: swap.
+><fs> mount /dev/sda1 /	Mounts the ext4 partition at the root of the guestfish virtual filesystem. Now you can browse it like a normal Linux FS.
+><fs> ls /root	Lists files in /root. Same as ls but inside the VM's disk.
+><fs> cat /root/finalflag.txt	Prints the file contents. Must use absolute path (/root/...), not relative.
+><fs> download /etc/shadow /tmp/shadow	Copies a file out of the VM disk to your host's /tmp/shadow.
+><fs> exit	Unmounts and closes the guestfish session.
+
+Key Flags
+Flag	Meaning
+--ro	Read-only. Always use this for forensics — you don't want to modify evidence.
+-a <file>	Add a disk image (.vmdk, .qcow2, .img) to work with.
+--rw	Read-write (dangerous for forensics — only use if you're fixing a VM).
+
+Common Mistakes
+Mistake	Fix
+cat finalflag.txt → error	Use absolute path: cat /root/finalflag.txt
+cat /etc/shadow → permission denied	You're already "root" inside guestfish, so this shouldn't happen. If it does, check you mounted the right partition.
+find / -name "*flag*" → very slow	Try targeted ls first, then find in specific dirs: find /root /home /tmp -name "*flag*"
+grep -r "THM{" / → slow	Same — limit to specific directories
+
+The Full Workflow (cheat sheet)
+# 1. Open the disk
+sudo guestfish --ro -a disk.vmdk
+
+# 2. Scan partitions
+><fs> run
+><fs> list-filesystems
+
+# 3. Mount the main partition
+><fs> mount /dev/sda1 /
+
+# 4. Explore
+><fs> ls /root
+><fs> ls /home
+><fs> cat /root/.bash_history
+><fs> cat /root/.mysql_history
+><fs> cat /etc/shadow
+
+# 5. Extract files to your host
+><fs> download /etc/shadow /tmp/shadow
+><fs> download /root/finalflag.txt /tmp/flag.txt
+
+# 6. Exit
+><fs> exit
+
+Why This Matters (Real-World)
+Scenario	How this applies
+Incident response	A server was compromised. You can't boot it (evidence preservation). You mount the disk read-only and find what the attacker did.
+Dead box analysis	A machine was wiped or is unreachable. The disk image is all you have.
+CTF forensics	Exactly what you just did — find the flag without needing network access or a running VM.
+
+The core principle: you don't need a running system to read its files. The data is just bytes on disk. guestfish gives you a shell to browse those bytes as a filesystem.

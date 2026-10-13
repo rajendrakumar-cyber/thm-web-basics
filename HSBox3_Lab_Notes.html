@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VM Forensics & Offline Disk Analysis Report - HSBox3</title>
+<style>
+  @page {
+    size: A4;
+    margin: 14mm 14mm 14mm 14mm;
+    @top-left {
+      content: "VM Forensics Report — HSBox3";
+      font-size: 8pt;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #64748b;
+      font-weight: 600;
+    }
+    @top-right {
+      content: "IBM Cyber Security Internship";
+      font-size: 8pt;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #64748b;
+      font-weight: 600;
+    }
+    @bottom-center {
+      content: "Page " counter(page) " of " counter(pages);
+      font-size: 8pt;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #94a3b8;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1e293b;
+    line-height: 1.42;
+    font-size: 9pt;
+    margin: 0;
+    padding: 0;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+
+  /* Header Section */
+  .header {
+    border-bottom: 2.5px solid #0284c7;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+  }
+
+  .badge {
+    display: inline-block;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-size: 7.5pt;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+  }
+
+  h1 {
+    font-size: 17pt;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 2px 0 6px 0;
+    letter-spacing: -0.4px;
+  }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1.2fr 1.2fr 1fr;
+    gap: 8px;
+    margin-top: 6px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 10px;
+  }
+
+  .meta-item {
+    font-size: 8.5pt;
+  }
+
+  .meta-label {
+    font-weight: 600;
+    color: #64748b;
+    display: block;
+    font-size: 6.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .meta-val {
+    color: #0f172a;
+    font-weight: 600;
+  }
+
+  h2 {
+    font-size: 11pt;
+    color: #0f172a;
+    border-left: 3.5px solid #0284c7;
+    padding-left: 7px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-weight: 700;
+    page-break-after: avoid;
+  }
+
+  h3 {
+    font-size: 9pt;
+    color: #1e293b;
+    margin-top: 8px;
+    margin-bottom: 3px;
+    font-weight: 700;
+    page-break-after: avoid;
+  }
+
+  p {
+    margin: 3px 0 5px 0;
+  }
+
+  ul {
+    margin: 3px 0 5px 0;
+    padding-left: 18px;
+  }
+
+  li {
+    margin-bottom: 2px;
+  }
+
+  /* Code & Terminal Blocks */
+  .terminal {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 5px;
+    padding: 6px 9px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 7.5pt;
+    line-height: 1.35;
+    margin: 4px 0 6px 0;
+    border: 1px solid #334155;
+    page-break-inside: avoid;
+  }
+
+  .terminal .prompt {
+    color: #38bdf8;
+    font-weight: 600;
+  }
+
+  .terminal .guestfish-prompt {
+    color: #f43f5e;
+    font-weight: 600;
+  }
+
+  .terminal .output {
+    color: #94a3b8;
+  }
+
+  .terminal .flag {
+    color: #4ade80;
+    font-weight: 700;
+  }
+
+  .terminal .flag-box {
+    color: #facc15;
+    font-weight: 600;
+  }
+
+  code {
+    background: #f1f5f9;
+    color: #0369a1;
+    padding: 1px 3px;
+    border-radius: 3px;
+    font-family: Consolas, monospace;
+    font-size: 7.5pt;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 5px 0 8px 0;
+    font-size: 7.5pt;
+    page-break-inside: avoid;
+  }
+
+  th {
+    background: #f1f5f9;
+    color: #334155;
+    text-align: left;
+    padding: 4px 7px;
+    font-weight: 700;
+    border-bottom: 2px solid #cbd5e1;
+    font-size: 7pt;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  td {
+    padding: 4px 7px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+  }
+
+  tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+
+  /* Figures / Images */
+  .figure {
+    margin: 6px 0 8px 0;
+    text-align: center;
+    page-break-inside: avoid;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    padding: 4px;
+    background: #ffffff;
+  }
+
+  .figure img {
+    max-width: 95%;
+    max-height: 195px;
+    height: auto;
+    border-radius: 3px;
+    display: block;
+    margin: 0 auto;
+    object-fit: contain;
+  }
+
+  .figcaption {
+    font-size: 7pt;
+    font-weight: 600;
+    color: #475569;
+    margin-top: 3px;
+  }
+
+  /* Callout Cards */
+  .callout {
+    background: #eff6ff;
+    border-left: 3.5px solid #3b82f6;
+    padding: 5px 8px;
+    border-radius: 0 5px 5px 0;
+    margin: 5px 0;
+    font-size: 8pt;
+    page-break-inside: avoid;
+  }
+
+  .callout-title {
+    font-weight: 700;
+    color: #1d4ed8;
+    margin-bottom: 2px;
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .flag-banner {
+    background: #ecfdf5;
+    border: 1.5px solid #10b981;
+    border-radius: 5px;
+    padding: 6px 10px;
+    margin: 6px 0;
+    page-break-inside: avoid;
+    text-align: center;
+  }
+
+  .flag-banner-title {
+    font-size: 7pt;
+    font-weight: 700;
+    color: #065f46;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .flag-banner-code {
+    font-family: Consolas, monospace;
+    font-size: 10pt;
+    font-weight: 800;
+    color: #047857;
+    margin-top: 2px;
+  }
+
+  .avoid-break {
+    page-break-inside: avoid;
+  }
+</style>
+</head>
+<body>
+
+  <!-- ==================== PAGE 1 ==================== -->
+  <div class="header">
+    <div class="badge">Digital Forensics & Incident Response</div>
+    <h1>Offline VM Disk Forensics: HSBox3 Analysis</h1>
+    <div class="meta-grid">
+      <div class="meta-item">
+        <span class="meta-label">Analyst</span>
+        <span class="meta-val">white</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Target Appliance</span>
+        <span class="meta-val">HSBox3.ova (VMDK)</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Forensic Method</span>
+        <span class="meta-val">Dead-Box (Guestfish)</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Flag Status</span>
+        <span class="meta-val" style="color: #059669;">Verified Solved</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>1. Objective & Forensic Rationale</h2>
+  <p>
+    The objective is to perform offline forensics on <code>HSBox3-disk001.vmdk</code> without booting the operating system. By attaching the virtual disk image in read-only mode using <code>guestfish</code>, we protect volatile state, maintain hash integrity, and safely extract the root flag alongside forensic artifacts.
+  </p>
+  <div class="callout">
+    <div class="callout-title">Cryptographic Integrity Note</div>
+    Forensic disk inspection is carried out using <code>guestfish --ro</code>. Read-only flags ensure no disk writes or metadata updates take place, preserving the evidence hash: <code>SHA1 = 4e468f030a3264dc7f0b4e70eaba499731e5870d</code>.
+  </div>
+
+  <h2>2. Toolset & Commands Overview</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">Tool / Command</th>
+        <th style="width: 25%;">Execution Mode</th>
+        <th>Forensic Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>guestfish --ro -a ...</code></td>
+        <td>Read-Only Disk Shell</td>
+        <td>Mounts and provides interactive inspection of the virtual disk.</td>
+      </tr>
+      <tr>
+        <td><code>list-filesystems</code></td>
+        <td>Partition Discovery</td>
+        <td>Identifies ext4 root (<code>/dev/sda1</code>) and swap partitions.</td>
+      </tr>
+      <tr>
+        <td><code>download ...</code></td>
+        <td>Evidence Acquisition</td>
+        <td>Extracts sensitive artifacts (e.g. <code>/etc/shadow</code>) to host workstation.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>3. Step 1: Disk Mounting & Flag Extraction</h2>
+  <p>
+    The disk image was initialized and mounted to the virtual root:
+  </p>
+  <div class="terminal">
+<span class="prompt">(white@white)-[~/white/ibm/intern]$</span> sudo guestfish --ro -a HSBox3-disk001.vmdk
+<span class="guestfish-prompt">&gt;&lt;fs&gt;</span> run
+<span class="guestfish-prompt">&gt;&lt;fs&gt;</span> list-filesystems
+<span class="output">/dev/sda1: ext4
+/dev/sda5: swap</span>
+<span class="guestfish-prompt">&gt;&lt;fs&gt;</span> mount /dev/sda1 /
+<span class="guestfish-prompt">&gt;&lt;fs&gt;</span> ls /root
+<span class="output">.bash_history  .bash_logout  .bashrc  .cache  .mysql_history  .nano_history  .profile  .selected_editor  finalflag.txt</span>
+<span class="guestfish-prompt">&gt;&lt;fs&gt;</span> cat /root/finalflag.txt
+<span class="flag-box">  .---------.
+  |.-------.|
+  ||&gt;run#  ||
+  ||       ||
+  |"-------'|
+.-^---------^-.
+| ---~        |
+"-------------'</span>
+<span class="flag">root-flag{edd321ad749bc103be8d63c13073b352}</span>
+  </div>
+
+  <div class="flag-banner">
+    <div class="flag-banner-title">Captured Root Flag</div>
+    <div class="flag-banner-code">root-flag{edd321ad749bc103be8d63c13073b352}</div>
+  </div>
+
+  <div class="figure">
+    <img src="Screenshot_2026-10-13_15-47-20.png" alt="Guestfish session mounting HSBox3 and retrieving flag">
+    <div class="figcaption">Figure 1: Mounting ext4 filesystem on /dev/sda1, listing /root, and retrieving root-flag.</div>
+  </div>
+
+  <!-- ==================== PAGE 2 ==================== -->
+  <div class="page-break"></div>
+
+  <h2>4. Forensic Artifact Analysis</h2>
+  <p>
+    A deep-dive investigation into user history files and sensitive system configurations uncovered critical anti-forensics sanitization and database credentials:
+  </p>
+
+  <div class="avoid-break">
+    <h3>4.1 Disk Sanitization Analysis (<code>.bash_history</code>)</h3>
+    <div class="terminal">
+<span class="guestfish-prompt">&gt;&lt;fs&gt;</span> cat /root/.bash_history
+<span class="output">apt install zerofree 
+reboot</span>
+    </div>
+    <ul>
+      <li><strong>Forensic Purpose of <code>zerofree</code>:</strong> The utility <code>zerofree</code> zeroes out unallocated filesystem blocks on ext2/ext3/ext4 partitions.</li>
+      <li><strong>Anti-Forensics Impact:</strong> Zero-filling unallocated disk space ensures deleted files and temporary data cannot be carved or recovered from disk slack by forensic analysts.</li>
+    </ul>
+  </div>
+
+  <div class="avoid-break">
+    <h3>4.2 Database Migration & Credential Leak (<code>.mysql_history</code>)</h3>
+    <div class="terminal">
+<span class="guestfish-prompt">&gt;&lt;fs&gt;</span> cat /root/.mysql_history
+<span class="output">create database pumpkins;
+GRANT ALL PRIVILEGES ON pumpkins.* TO 'admin'@'localhost' IDENTIFIED BY 'admin';
+grant all privilages on pumpkins.* TO 'admin'@'localhost' identified by 'admin';
+show databases;
+use pumpkins;
+show tables;
+select * from wp_users;
+use pumpkins;
+show tables;
+select * from wp_user;
+select * from wp_users;
+use pumpkins
+select * from wp_users;
+show databases;
+drop database pumpkins;
+show databases;
+CREATE DATABASE hackerschool;
+GRANT ALL PRIVILEGES ON hackerschool.* TO 'admin'@'localhost' IDENTIFIED BY 'adminpass20';
+FLUSH PRIVILEGES;
+EXIT;</span>
+    </div>
+    <ul>
+      <li><strong>WordPress Reconnaissance & Deletion:</strong> The operator inspected WordPress users in table <code>wp_users</code> under database <code>pumpkins</code>, then destroyed the database schema with <code>drop database pumpkins;</code>.</li>
+      <li><strong>Active Production Database:</strong> Provisioned a new database named <code>hackerschool</code>.</li>
+      <li><strong>Plaintext Credentials Recovered:</strong>
+        <ul>
+          <li>Legacy user: <code>admin</code> : <code>admin</code></li>
+          <li>Active administrator: <code>admin@localhost</code> : <code>adminpass20</code></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="avoid-break">
+    <h3>4.3 Shadow File Extraction & Password Hash (<code>/etc/shadow</code>)</h3>
+    <p>
+      The analyst inspected and extracted <code>/etc/shadow</code> to the host system using <code>download</code>:
+    </p>
+    <div class="terminal">
+<span class="guestfish-prompt">&gt;&lt;fs&gt;</span> cat /etc/shadow
+<span class="output">root:$6$wOlM44Zc$CZE.UYngQOICe6AJO9TPZB/oTbNz7KUbavUOutoCBt9Ss3e42v3elhgezv/4AgLw.S5p0TBIyqzaIt9LXhy3Z0:18976:0:99999:7:::</span>
+<span class="guestfish-prompt">&gt;&lt;fs&gt;</span> download /etc/shadow /tmp/shadow
+    </div>
+    <ul>
+      <li><strong>Hash Algorithm:</strong> SHA-512 crypt (indicated by prefix <code>$6$</code>).</li>
+      <li><strong>Salt & Hash:</strong> Salt <code>wOlM44Zc</code> | Stored Hash <code>CZE.UYngQOICe6AJO9TPZB/oTbNz7KUbavUOutoCBt9Ss3e42v3elhgezv/4AgLw...</code></li>
+      <li><strong>Offline Acquisition:</strong> Extracted directly to <code>/tmp/shadow</code> for offline dictionary cracking without running processes on the target VM.</li>
+    </ul>
+  </div>
+
+  <!-- ==================== PAGE 3 ==================== -->
+  <div class="page-break"></div>
+
+  <h2>5. Command Reference: Guestfish Forensics Cheat Sheet</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 32%;">Action</th>
+        <th>Guestfish Command</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Attach disk image in read-only mode</td>
+        <td><code>sudo guestfish --ro -a HSBox3-disk001.vmdk</code></td>
+      </tr>
+      <tr>
+        <td>Boot appliance virtualization backend</td>
+        <td><code>&gt;&lt;fs&gt; run</code></td>
+      </tr>
+      <tr>
+        <td>Enumerate disk partitions & filesystems</td>
+        <td><code>&gt;&lt;fs&gt; list-filesystems</code></td>
+      </tr>
+      <tr>
+        <td>Mount ext4 partition to root</td>
+        <td><code>&gt;&lt;fs&gt; mount /dev/sda1 /</code></td>
+      </tr>
+      <tr>
+        <td>Inspect directory contents (Requires path)</td>
+        <td><code>&gt;&lt;fs&gt; ls /root</code></td>
+      </tr>
+      <tr>
+        <td>Display file contents (Absolute path)</td>
+        <td><code>&gt;&lt;fs&gt; cat /root/finalflag.txt</code></td>
+      </tr>
+      <tr>
+        <td>Extract evidence file to host workstation</td>
+        <td><code>&gt;&lt;fs&gt; download /etc/shadow /tmp/shadow</code></td>
+      </tr>
+      <tr>
+        <td>Terminate guestfish session</td>
+        <td><code>&gt;&lt;fs&gt; exit</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>6. Key Artifacts & Verification Table</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 30%;">Forensic Artifact</th>
+        <th>Discovered Value / Significance</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Final Root Flag</strong></td>
+        <td><strong style="color: #059669;">root-flag{edd321ad749bc103be8d63c13073b352}</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Active MySQL Database</strong></td>
+        <td><code>hackerschool</code></td>
+      </tr>
+      <tr>
+        <td><strong>Discovered MySQL Credentials</strong></td>
+        <td><code>admin</code> : <code>adminpass20</code> (Active) | <code>admin</code> : <code>admin</code> (Legacy)</td>
+      </tr>
+      <tr>
+        <td><strong>Anti-Forensics Utility</strong></td>
+        <td><code>zerofree</code> (used to zero-fill unallocated blocks)</td>
+      </tr>
+      <tr>
+        <td><strong>Extracted Hash File</strong></td>
+        <td><code>/tmp/shadow</code> (Root SHA-512 crypt hash recovered)</td>
+      </tr>
+      <tr>
+        <td><strong>Disk Image SHA-1 Hash</strong></td>
+        <td><code>4e468f030a3264dc7f0b4e70eaba499731e5870d</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout" style="margin-top: 15px;">
+    <div class="callout-title">Investigation Conclusion</div>
+    Through read-only dead-box forensics with <code>guestfish</code>, the analyst successfully preserved disk evidence, bypassed live system defenses, extracted the target CTF flag, and reconstructed post-exploitation activities without altering the underlying VMDK filesystem.
+  </div>
+
+</body>
+</html>
